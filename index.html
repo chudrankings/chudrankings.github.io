@@ -1,1 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chud Rankings</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&display=swap');
 
+        :root {
+            --bg-color: #050505;
+            --panel-bg: #111;
+            --neon-green: #39ff14;
+            --neon-red: #ff073a;
+            --text-main: #fff;
+            --text-muted: #888;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Rajdhani', sans-serif;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Glitchy Header */
+        .header {
+            position: absolute;
+            top: 20px;
+            left: 30px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--neon-green);
+            text-shadow: 0 0 10px var(--neon-green), 0 0 20px var(--neon-green);
+            z-index: 10;
+        }
+
+        /* Layout Grid */
+        .container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            padding: 80px 30px 30px 30px;
+            gap: 30px;
+        }
+
+        /* Left Side: Scrollable List */
+        .list-section {
+            flex: 1;
+            background: rgba(17, 17, 17, 0.8);
+            border: 1px solid #333;
+            border-radius: 15px;
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+        }
+
+        .list-section::-webkit-scrollbar { width: 8px; }
+        .list-section::-webkit-scrollbar-track { background: #000; }
+        .list-section::-webkit-scrollbar-thumb { background: var(--neon-green); border-radius: 4px; }
+
+        .rank-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: #1a1a1a;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            border-left: 4px solid transparent;
+        }
+
+        .rank-item:hover, .rank-item.active {
+            background: #222;
+            border-left: 4px solid var(--neon-green);
+            transform: translateX(5px);
+            box-shadow: 0 0 15px rgba(57, 255, 20, 0.2);
+        }
+
+        .rank-number {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            width: 40px;
+        }
+
+        .rank-name {
+            flex: 1;
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        .rank-score-mini {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-green);
+            font-weight: 900;
+        }
+
+        /* Right Side: Profile Detail Card */
+        .detail-section {
+            flex: 1;
+            background: linear-gradient(145deg, #111, #0a0a0a);
+            border: 1px solid #333;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.9);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Cool glowing background effect behind profile */
+        .detail-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(57,255,20,0.1) 0%, transparent 60%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .profile-img-container {
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            border: 4px solid var(--neon-green);
+            box-shadow: 0 0 25px var(--neon-green);
+            overflow: hidden;
+            z-index: 1;
+            margin-bottom: 30px;
+            background-color: #222;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .profile-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .profile-score {
+            font-size: 2rem;
+            color: var(--neon-green);
+            margin-bottom: 25px;
+            z-index: 1;
+            font-weight: 700;
+            text-shadow: 0 0 10px var(--neon-green);
+        }
+
+        .profile-desc {
+            font-size: 1.2rem;
+            color: #ccc;
+            text-align: center;
+            line-height: 1.6;
+            z-index: 1;
+            max-width: 80%;
+        }
+
+        /* Default Empty State */
+        #profile-content {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+        #empty-state {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">CHUD_RANKINGS_</div>
+
+    <div class="container">
+        <!-- List Panel -->
+        <div class="list-section" id="list-container">
+            <!-- JavaScript will populate this -->
+        </div>
+
+        <!-- Detail Panel -->
+        <div class="detail-section">
+            <div id="empty-state">SELECT A SUBJECT TO VIEW STATS</div>
+            
+            <div id="profile-content">
+                <div class="profile-img-container">
+                    <!-- Drop your images in an "images" folder, e.g., images/1.jpg -->
+                    <img id="display-img" class="profile-img" src="" alt="Face" onerror="this.src='https://via.placeholder.com/250/222222/39ff14?text=NO+IMAGE'">
+                </div>
+                <h1 id="display-name" class="profile-name">Name</h1>
+                <div class="profile-score">CHUD SCORE: <span id="display-score">0</span></div>
+                <p id="display-desc" class="profile-desc">Description goes here.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 70 EXAMPLE NAMES (EDIT THESE!) ---
+        // Change the name, score, description, and image filename to whatever you want.
+        const chudData = [
+            { name: "Chudley", score: 99, desc: "An absolute unit. Emits pure radioactive energy.", img: "images/1.jpg" },
+            { name: "GigaChud", score: 98, desc: "Jawline sharper than a diamond pickaxe.", img: "images/2.jpg" },
+            { name: "Barnaby", score: 95, desc: "Eats drywall for breakfast.", img: "images/3.jpg" },
+            { name: "Grumbo", score: 92, desc: "Hasn't seen the sun since 2018.", img: "images/4.jpg" },
+            { name: "Zonk", score: 90, desc: "Operates entirely on gamer fuel.", img: "images/5.jpg" },
+            { name: "Blorp", score: 88, desc: "Keyboard is missing all the WASD keys.", img: "images/6.jpg" },
+            { name: "MegaGamer", score: 85, desc: "Banned from 14 different Discord servers.", img: "images/7.jpg" },
+            { name: "Snorkel", score: 84, desc: "Wears a trench coat in the summer.", img: "images/8.jpg" },
+            { name: "Puck", score: 82, desc: "Maintains a strict diet of instant ramen.", img: "images/9.jpg" },
+            { name: "Vortex", score: 80, desc: "Claims to have hacked the mainframe.", img: "images/10.jpg" }
+        ];
+
+        // Automatically generating the remaining 60 to hit exactly 70 for your list.
+        // You can replace these generated ones with real objects just like the top 10!
+        const genericNames = ["Crimson", "Shadow", "Neon", "Cyber", "Venom", "Phantom", "Rogue"];
+        for(let i = 11; i <= 70; i++) {
+            let randomName = genericNames[i % genericNames.length] + "_" + i;
+            chudData.push({
+                name: randomName,
+                score: Math.floor(Math.random() * 40) + 40, // Random score between 40-79
+                desc: "Data file corrupted. Subject analysis pending...",
+                img: `images/${i}.jpg`
+            });
+        }
+
+        // Sort by score descending so the highest is at the top
+        chudData.sort((a, b) => b.score - a.score);
+
+        const listContainer = document.getElementById('list-container');
+        const emptyState = document.getElementById('empty-state');
+        const profileContent = document.getElementById('profile-content');
+        
+        const displayImg = document.getElementById('display-img');
+        const displayName = document.getElementById('display-name');
+        const displayScore = document.getElementById('display-score');
+        const displayDesc = document.getElementById('display-desc');
+
+        let activeItem = null;
+
+        // Render the list
+        chudData.forEach((chud, index) => {
+            const item = document.createElement('div');
+            item.className = 'rank-item';
+            item.innerHTML = `
+                <div class="rank-number">#${index + 1}</div>
+                <div class="rank-name">${chud.name}</div>
+                <div class="rank-score-mini">${chud.score}</div>
+            `;
+            
+            item.addEventListener('click', () => {
+                // Remove active class from previous
+                if(activeItem) activeItem.classList.remove('active');
+                
+                // Add active class to current
+                item.classList.add('active');
+                activeItem = item;
+
+                // Hide empty state, show profile
+                emptyState.style.display = 'none';
+                profileContent.style.display = 'flex';
+
+                // Update Profile Data
+                displayImg.src = chud.img;
+                displayName.textContent = chud.name;
+                displayScore.textContent = chud.score;
+                displayDesc.textContent = chud.desc;
+            });
+
+            listContainer.appendChild(item);
+        });
+    </script>
+</body>
+</html>
