@@ -104,6 +104,37 @@
             box-shadow: 0 0 15px var(--border-glow);
         }
 
+        /* INSANE GOD-TIER RANK #0 STYLE */
+        .rank-item.god-tier {
+            border-left: 4px solid var(--neon-red);
+            background: linear-gradient(90deg, rgba(255, 7, 58, 0.12), transparent);
+            animation: system-glitch-pulse 2s infinite alternate;
+            border-color: rgba(255, 7, 58, 0.4);
+        }
+
+        .rank-item.god-tier.active {
+            border-left: 4px solid var(--neon-red);
+            border-color: var(--neon-red);
+            box-shadow: 0 0 20px rgba(255, 7, 58, 0.4);
+        }
+
+        .rank-item.god-tier .rank-number {
+            color: var(--neon-red) !important;
+            text-shadow: 0 0 10px var(--neon-red);
+        }
+
+        .rank-item.god-tier .rank-score-mini {
+            background: rgba(255, 7, 58, 0.15);
+            border-color: var(--neon-red);
+            color: var(--neon-red);
+            text-shadow: 0 0 5px var(--neon-red);
+        }
+
+        @keyframes system-glitch-pulse {
+            0% { box-shadow: 0 0 4px rgba(255, 7, 58, 0.1); }
+            100% { box-shadow: 0 0 12px rgba(255, 7, 58, 0.3); }
+        }
+
         .rank-number {
             font-family: 'Orbitron', sans-serif;
             color: var(--neon-green);
@@ -154,10 +185,9 @@
             transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Action HUD Header for Detail Panel (Mainly Mobile Close) */
         .detail-hud-actions {
             width: 100%;
-            display: none; /* Hidden on desktop */
+            display: none;
             justify-content: flex-end;
             margin-bottom: 15px;
         }
@@ -193,15 +223,6 @@
             position: relative;
         }
 
-        /* Angular sci-fi corners for the image container */
-        .profile-img-container::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            border: 1px solid rgba(255,255,255,0.05);
-            pointer-events: none;
-        }
-
         .profile-img {
             width: 100%;
             height: 100%;
@@ -230,6 +251,18 @@
             padding: 4px 16px;
             border-radius: 20px;
             border: 1px solid rgba(57, 255, 20, 0.2);
+        }
+
+        /* Dynamically changes to Red glow when selecting Rank 0 */
+        .detail-section.god-tier-active .profile-img-container {
+            border-color: var(--neon-red);
+            box-shadow: 0 0 25px rgba(255, 7, 58, 0.5);
+        }
+        .detail-section.god-tier-active .profile-score {
+            color: var(--neon-red);
+            text-shadow: 0 0 10px rgba(255, 7, 58, 0.5);
+            background: rgba(255, 7, 58, 0.05);
+            border-color: rgba(255, 7, 58, 0.3);
         }
 
         .profile-desc {
@@ -266,9 +299,7 @@
             border-radius: 8px;
         }
 
-        /* -----------------------------------------
-           CROSS-DEVICE RESPONSIVE REMASTER (MOBILE/TABLET)
-        ----------------------------------------- */
+        /* Mobile Layout Modifications */
         @media (max-width: 820px) {
             body {
                 height: 100vh;
@@ -293,7 +324,6 @@
                 border-radius: 8px;
             }
 
-            /* Turn detail view into an insane slide-up overlay on Mobile */
             .detail-section {
                 position: fixed;
                 bottom: 0;
@@ -304,18 +334,22 @@
                 border-radius: 20px 20px 0 0;
                 border-top: 2px solid var(--neon-green);
                 box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.95), 0 -5px 25px var(--border-glow);
-                transform: translateY(105%); /* Hidden below screen by default */
+                transform: translateY(105%);
                 padding: 25px 20px;
                 background: #090909;
             }
 
-            /* When active, slide it up smoothly */
+            .detail-section.god-tier-active {
+                border-top: 2px solid var(--neon-red);
+                box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.95), 0 -5px 25px rgba(255, 7, 58, 0.4);
+            }
+
             .detail-section.mobile-open {
                 transform: translateY(0);
             }
 
             .detail-hud-actions {
-                display: flex; /* Show exit button on mobile */
+                display: flex;
             }
 
             .profile-img-container {
@@ -339,14 +373,14 @@
             }
 
             #empty-state {
-                display: none; /* Don't need structural filler on mobile overlay */
+                display: none;
             }
         }
     </style>
 </head>
 <body>
 
-    <div class="header">// CHUD_RANKINGS_</div>
+    <div class="header">// SYSTEM:_CHUD_MATRIX</div>
 
     <div class="container">
         <!-- Scrollable Leaderboard List -->
@@ -358,7 +392,7 @@
                 <button class="close-btn" id="close-terminal">Back to List</button>
             </div>
 
-            <div id="empty-state">SELECT SUBJECT FOR ANALYTICS</div>
+            <div id="empty-state">SELECT SUBJECT FOR DOSSIER ANALYTICS</div>
             
             <div id="profile-content">
                 <div class="profile-img-container">
@@ -372,8 +406,10 @@
     </div>
 
     <script>
-        // --- 70 HARDCODED EXAMPLE CONFIGS ---
+        // --- HARDCODED DATA CONFIGURATIONS ---
+        // Rank #0 sits perfectly at index 0 with a score of 100.
         const chudData = [
+            { name: "Darius and Vidhur", score: 100, desc: "System Sovereigns. Their absolute data structures completely shattered the baseline metrics of the ranking core.", img: "images/0.jpg" },
             { name: "Chudley", score: 99, desc: "An absolute unit. Emits pure radioactive power cells.", img: "images/1.jpg" },
             { name: "GigaChud", score: 98, desc: "Jawline completely sharper than a diamond pickaxe.", img: "images/2.jpg" },
             { name: "Barnaby", score: 95, desc: "Eats structural drywall panels for breakfast.", img: "images/3.jpg" },
@@ -386,19 +422,19 @@
             { name: "Vortex", score: 80, desc: "Claims to have repeatedly bypassed the local mainframe.", img: "images/10.jpg" }
         ];
 
-        // Safely generate the remaining entries up to 70 total
+        // Safely generate the remaining entries down to 70 total example slots
         const genericPrefixes = ["Hex", "Cipher", "Viper", "Glitch", "Acid", "Static", "Titan", "Null"];
         for(let i = 11; i <= 70; i++) {
             let computedName = genericPrefixes[i % genericPrefixes.length] + "_" + i;
             chudData.push({
                 name: computedName,
-                score: Math.floor(Math.random() * 41) + 35, // Balanced distribution
+                score: Math.floor(Math.random() * 41) + 35,
                 desc: `System data file [${i}] currently uninitialized. Subject analysis tracking parameters pending clear field data input...`,
                 img: `images/${i}.jpg`
             });
         }
 
-        // Keep higher scores sitting cleanly on top
+        // Keep sorting fully structured (100 automatically sits at the top)
         chudData.sort((a, b) => b.score - a.score);
 
         const listContainer = document.getElementById('list-container');
@@ -417,9 +453,14 @@
         // Populate Interface Leaderboard
         chudData.forEach((chud, index) => {
             const item = document.createElement('div');
-            item.className = 'rank-item';
+            
+            // Check if this is the god-tier score element to attach glitch aesthetics
+            const isGodTier = chud.score === 100;
+            item.className = `rank-item ${isGodTier ? 'god-tier' : ''}`;
+            
+            // Render index cleanly (0 for Darius/Vidhur, 1, 2, 3... for the rest)
             item.innerHTML = `
-                <div class="rank-number">#${index + 1}</div>
+                <div class="rank-number">#${index}</div>
                 <div class="rank-name">${chud.name}</div>
                 <div class="rank-score-mini">${chud.score}</div>
             `;
@@ -429,7 +470,6 @@
                 item.classList.add('active');
                 activeItem = item;
 
-                // Toggle visibility states
                 if(emptyState) emptyState.style.display = 'none';
                 profileContent.style.display = 'flex';
 
@@ -439,14 +479,24 @@
                 displayScore.textContent = chud.score;
                 displayDesc.textContent = chud.desc;
 
-                // Handle Mobile view expansion slide-up
+                // Adjust color theme dynamically if Rank #0 is open
+                if(isGodTier) {
+                    detailTerminal.classList.add('god-tier-active');
+                    // Fallback placeholder image handling for Rank 0
+                    displayImg.onerror = function() { this.src = 'https://via.placeholder.com/250/090909/ff073a?text=SYSTEM+BREAKERS'; };
+                } else {
+                    detailTerminal.classList.remove('god-tier-active');
+                    displayImg.onerror = function() { this.src = 'https://via.placeholder.com/250/090909/39ff14?text=NO+DOSSIER+IMG'; };
+                }
+
+                // Handle Mobile view drawer slide-up
                 detailTerminal.classList.add('mobile-open');
             });
 
             listContainer.appendChild(item);
         });
 
-        // Close button action listener (Mobile exclusive overlay drop down)
+        // Close drawer (Mobile feature)
         closeTerminalBtn.addEventListener('click', () => {
             detailTerminal.classList.remove('mobile-open');
             if(activeItem) {
