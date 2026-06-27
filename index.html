@@ -3,18 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chud Rankings</title>
+    <title>Chud Rankings: Overdrive</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700;900&display=swap');
 
         :root {
-            --bg-color: #030303;
-            --panel-bg: #0b0b0b;
+            --bg-color: #020202;
+            --panel-bg: rgba(10, 10, 10, 0.85);
             --neon-green: #39ff14;
+            --neon-green-dim: #1a660a;
             --neon-red: #ff073a;
             --text-main: #ffffff;
-            --text-muted: #666666;
-            --border-glow: rgba(57, 255, 20, 0.3);
+            --text-muted: #555555;
+            --border-glow: rgba(57, 255, 20, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.1);
         }
 
         * {
@@ -24,32 +26,88 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* Cyberpunk Scanline Effect Background */
+        /* CRT Arcade Overlay Effect */
+        body::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
         body {
             background-color: var(--bg-color);
-            background-image: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            background-size: 100% 4px, 6px 100%;
             color: var(--text-main);
             font-family: 'Rajdhani', sans-serif;
             display: flex;
             flex-direction: column;
             height: 100vh;
             overflow: hidden;
+            position: relative;
         }
 
-        /* Tactical Header */
+        /* Glitching Header */
         .header {
             padding: 20px 30px;
             font-family: 'Orbitron', sans-serif;
-            font-size: 1.8rem;
+            font-size: 2rem;
             font-weight: 900;
             color: var(--neon-green);
-            text-shadow: 0 0 10px var(--neon-green);
-            letter-spacing: 3px;
-            border-bottom: 1px solid #1a1a1a;
-            background: rgba(5, 5, 5, 0.9);
-            backdrop-filter: blur(5px);
+            text-shadow: 0 0 15px var(--neon-green);
+            letter-spacing: 4px;
+            border-bottom: 1px solid var(--neon-green-dim);
+            background: linear-gradient(90deg, rgba(10, 10, 10, 0.9), rgba(0, 0, 0, 0.9));
+            backdrop-filter: blur(10px);
             z-index: 10;
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header span {
+            animation: glitch-anim 3s infinite;
+        }
+
+        @keyframes glitch-anim {
+            0% { text-shadow: 0 0 15px var(--neon-green); transform: translate(0); }
+            2% { text-shadow: -3px 0 red, 3px 0 blue; transform: translate(-2px, 1px); }
+            4% { text-shadow: 0 0 15px var(--neon-green); transform: translate(0); }
+            100% { text-shadow: 0 0 15px var(--neon-green); }
+        }
+
+        /* Search Bar */
+        .search-container {
+            position: relative;
+            width: 300px;
+        }
+        
+        .search-bar {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--neon-green-dim);
+            color: var(--neon-green);
+            font-family: 'Orbitron', sans-serif;
+            padding: 10px 15px;
+            border-radius: 4px;
+            outline: none;
+            transition: all 0.3s;
+            text-transform: uppercase;
+        }
+
+        .search-bar:focus {
+            border-color: var(--neon-green);
+            box-shadow: 0 0 15px var(--border-glow);
+        }
+
+        .search-bar::placeholder {
+            color: var(--neon-green-dim);
         }
 
         /* Main Workspace Layout */
@@ -58,138 +116,147 @@
             flex: 1;
             padding: 20px;
             gap: 20px;
-            height: calc(100vh - 80px);
+            height: calc(100vh - 85px);
             overflow: hidden;
+            z-index: 3;
+            position: relative;
         }
 
         /* Left Side: Scrollable Database List */
         .list-section {
             flex: 1.2;
             background: var(--panel-bg);
-            border: 1px solid #222;
+            border: 1px solid var(--glass-border);
             border-radius: 12px;
             padding: 15px;
             overflow-y: auto;
             position: relative;
+            backdrop-filter: blur(5px);
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
         }
 
-        .list-section::-webkit-scrollbar { width: 6px; }
-        .list-section::-webkit-scrollbar-track { background: #050505; }
-        .list-section::-webkit-scrollbar-thumb { background: var(--neon-green); border-radius: 3px; }
+        .list-section::-webkit-scrollbar { width: 4px; }
+        .list-section::-webkit-scrollbar-track { background: transparent; }
+        .list-section::-webkit-scrollbar-thumb { background: var(--neon-green); border-radius: 2px; }
 
         .rank-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 14px 18px;
-            background: #111;
-            margin-bottom: 8px;
-            border-radius: 6px;
+            background: rgba(20, 20, 20, 0.6);
+            margin-bottom: 10px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1px solid #1a1a1a;
+            transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid transparent;
             border-left: 4px solid #333;
+            animation: slide-in 0.3s ease-out forwards;
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+
+        @keyframes slide-in {
+            to { opacity: 1; transform: translateX(0); }
         }
 
         .rank-item:hover {
-            background: #161616;
+            background: rgba(30, 30, 30, 0.8);
             border-color: #444;
-            transform: translateX(4px);
+            transform: translateX(8px) scale(1.01);
         }
 
         .rank-item.active {
-            background: #1a1a1a;
+            background: rgba(15, 40, 15, 0.8);
             border-color: var(--neon-green);
             border-left: 4px solid var(--neon-green);
-            box-shadow: 0 0 15px var(--border-glow);
+            box-shadow: 0 0 20px var(--border-glow);
         }
 
         /* INSANE GOD-TIER RANK #0 STYLE */
         .rank-item.god-tier {
             border-left: 4px solid var(--neon-red);
-            background: linear-gradient(90deg, rgba(255, 7, 58, 0.12), transparent);
-            animation: system-glitch-pulse 2s infinite alternate;
+            background: linear-gradient(90deg, rgba(255, 7, 58, 0.15), rgba(0,0,0,0.5));
             border-color: rgba(255, 7, 58, 0.4);
+            animation: system-glitch-pulse 1.5s infinite alternate, slide-in 0.3s ease-out forwards;
         }
 
         .rank-item.god-tier.active {
             border-left: 4px solid var(--neon-red);
             border-color: var(--neon-red);
-            box-shadow: 0 0 20px rgba(255, 7, 58, 0.4);
+            box-shadow: 0 0 30px rgba(255, 7, 58, 0.5);
+            background: linear-gradient(90deg, rgba(255, 7, 58, 0.25), rgba(0,0,0,0.8));
         }
 
-        .rank-item.god-tier .rank-number {
+        .rank-item.god-tier .rank-number, .rank-item.god-tier .rank-score-mini {
             color: var(--neon-red) !important;
-            text-shadow: 0 0 10px var(--neon-red);
-        }
-
-        .rank-item.god-tier .rank-score-mini {
-            background: rgba(255, 7, 58, 0.15);
+            text-shadow: 0 0 15px var(--neon-red);
             border-color: var(--neon-red);
-            color: var(--neon-red);
-            text-shadow: 0 0 5px var(--neon-red);
+            background: rgba(255, 7, 58, 0.1);
         }
 
         @keyframes system-glitch-pulse {
-            0% { box-shadow: 0 0 4px rgba(255, 7, 58, 0.1); }
-            100% { box-shadow: 0 0 12px rgba(255, 7, 58, 0.3); }
+            0% { box-shadow: inset 0 0 5px rgba(255, 7, 58, 0.2); }
+            100% { box-shadow: inset 0 0 20px rgba(255, 7, 58, 0.5); }
         }
 
         .rank-number {
             font-family: 'Orbitron', sans-serif;
             color: var(--neon-green);
-            font-size: 1.1rem;
-            font-weight: 700;
-            width: 45px;
+            font-size: 1.2rem;
+            font-weight: 900;
+            width: 50px;
         }
 
         .rank-name {
             flex: 1;
-            font-size: 1.3rem;
+            font-size: 1.4rem;
             font-weight: 700;
             letter-spacing: 1px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            padding-right: 10px;
+            padding-right: 15px;
         }
 
         .rank-score-mini {
             font-family: 'Orbitron', sans-serif;
-            color: var(--text-main);
-            background: #222;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 0.9rem;
+            color: #fff;
+            background: #000;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 1rem;
             font-weight: 900;
-            border: 1px solid #333;
+            border: 1px solid var(--text-muted);
+            min-width: 50px;
+            text-align: center;
         }
 
         .rank-item.active .rank-score-mini {
-            background: rgba(57, 255, 20, 0.1);
             border-color: var(--neon-green);
             color: var(--neon-green);
+            text-shadow: 0 0 8px var(--neon-green);
         }
 
         /* Right Side: Visual Data Terminal */
         .detail-section {
             flex: 1;
-            background: radial-gradient(circle at top, #141414 0%, var(--panel-bg) 100%);
-            border: 1px solid #222;
+            background: radial-gradient(circle at top right, rgba(20,20,20,0.9) 0%, rgba(5,5,5,0.95) 100%);
+            border: 1px solid var(--glass-border);
             border-radius: 12px;
             display: flex;
             flex-direction: column;
             align-items: center;
             padding: 30px;
             position: relative;
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: inset 0 0 50px rgba(0,0,0,1);
         }
 
         .detail-hud-actions {
             width: 100%;
             display: none;
             justify-content: flex-end;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
         .close-btn {
@@ -202,79 +269,145 @@
             border-radius: 4px;
             cursor: pointer;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.2s;
-        }
-
-        .close-btn:active {
-            background: var(--neon-red);
-            color: #000;
         }
 
         .profile-img-container {
-            width: 220px;
-            height: 220px;
-            border-radius: 8px;
+            width: 200px;
+            height: 200px;
+            border-radius: 12px;
             border: 2px solid var(--neon-green);
-            box-shadow: 0 0 20px rgba(57, 255, 20, 0.2);
+            box-shadow: 0 0 25px rgba(57, 255, 20, 0.2);
             overflow: hidden;
-            margin-bottom: 25px;
-            background-color: #0d0d0d;
+            margin-bottom: 20px;
+            background-color: #050505;
             position: relative;
         }
 
-        .profile-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+        .profile-img-container::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(57,255,20,0.1) 0%, transparent 50%, rgba(57,255,20,0.1) 100%);
+            pointer-events: none;
         }
+
+        .profile-img { width: 100%; height: 100%; object-fit: cover; }
 
         .profile-name {
             font-family: 'Orbitron', sans-serif;
             font-size: 2.2rem;
             text-transform: uppercase;
             letter-spacing: 2px;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
             text-align: center;
             color: #fff;
-            text-shadow: 0 0 8px rgba(255,255,255,0.2);
+            text-shadow: 0 0 10px rgba(255,255,255,0.4);
         }
+
+        /* Voting System UI */
+        .vote-console {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            background: rgba(0,0,0,0.6);
+            padding: 10px 20px;
+            border-radius: 30px;
+            border: 1px solid #333;
+        }
+
+        .vote-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            outline: none;
+        }
+
+        .vote-btn.up:hover { color: var(--neon-green); text-shadow: 0 0 15px var(--neon-green); transform: translateY(-3px); }
+        .vote-btn.down:hover { color: var(--neon-red); text-shadow: 0 0 15px var(--neon-red); transform: translateY(3px); }
+        .vote-btn:active { transform: scale(0.8); }
 
         .profile-score {
             font-family: 'Orbitron', sans-serif;
-            font-size: 1.5rem;
+            font-size: 2rem;
             color: var(--neon-green);
-            margin-bottom: 20px;
-            font-weight: 700;
-            text-shadow: 0 0 10px rgba(57, 255, 20, 0.4);
-            background: rgba(57, 255, 20, 0.05);
-            padding: 4px 16px;
-            border-radius: 20px;
-            border: 1px solid rgba(57, 255, 20, 0.2);
-        }
-
-        /* Dynamically changes to Red glow when selecting Rank 0 */
-        .detail-section.god-tier-active .profile-img-container {
-            border-color: var(--neon-red);
-            box-shadow: 0 0 25px rgba(255, 7, 58, 0.5);
-        }
-        .detail-section.god-tier-active .profile-score {
-            color: var(--neon-red);
-            text-shadow: 0 0 10px rgba(255, 7, 58, 0.5);
-            background: rgba(255, 7, 58, 0.05);
-            border-color: rgba(255, 7, 58, 0.3);
+            font-weight: 900;
+            text-shadow: 0 0 15px rgba(57, 255, 20, 0.6);
+            min-width: 60px;
+            text-align: center;
         }
 
         .profile-desc {
             font-size: 1.15rem;
-            color: #b3b3b3;
+            color: #ccc;
             text-align: center;
-            line-height: 1.5;
-            max-width: 90%;
-            background: rgba(0,0,0,0.3);
+            line-height: 1.6;
+            width: 100%;
+            background: rgba(0,0,0,0.5);
             padding: 15px;
-            border-radius: 6px;
-            border: 1px solid #1a1a1a;
+            border-radius: 8px;
+            border: 1px solid #222;
+            margin-bottom: 25px;
+        }
+
+        /* Diagnostic Stat Bars */
+        .stats-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .stat-row {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .stat-labels {
+            display: flex;
+            justify-content: space-between;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            color: #aaa;
+            text-transform: uppercase;
+        }
+
+        .stat-bar-bg {
+            width: 100%;
+            height: 8px;
+            background: #111;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid #222;
+        }
+
+        .stat-bar-fill {
+            height: 100%;
+            background: var(--neon-green);
+            box-shadow: 0 0 10px var(--neon-green);
+            transition: width 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: 0%;
+        }
+
+        /* Red Styling for Rank 0 Details */
+        .detail-section.god-tier-active .profile-img-container {
+            border-color: var(--neon-red);
+            box-shadow: 0 0 35px rgba(255, 7, 58, 0.6);
+        }
+        .detail-section.god-tier-active .profile-score {
+            color: var(--neon-red);
+            text-shadow: 0 0 20px rgba(255, 7, 58, 0.8);
+        }
+        .detail-section.god-tier-active .stat-bar-fill {
+            background: var(--neon-red);
+            box-shadow: 0 0 10px var(--neon-red);
+        }
+        .detail-section.god-tier-active .vote-console {
+            display: none; /* System Sovereigns cannot be voted on */
         }
 
         #profile-content {
@@ -282,105 +415,63 @@
             flex-direction: column;
             align-items: center;
             width: 100%;
+            height: 100%;
         }
 
         #empty-state {
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100%;
             color: var(--text-muted);
             font-family: 'Orbitron', sans-serif;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             letter-spacing: 2px;
             text-align: center;
-            border: 1px dashed #222;
+            border: 1px dashed #333;
             width: 100%;
             border-radius: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
         }
 
         /* Mobile Layout Modifications */
         @media (max-width: 820px) {
-            body {
-                height: 100vh;
-                position: relative;
-            }
-
-            .header {
-                font-size: 1.4rem;
-                padding: 15px 20px;
-                text-align: center;
-            }
-
-            .container {
-                padding: 10px;
-                position: relative;
-                height: calc(100vh - 60px);
-            }
-
-            .list-section {
-                flex: 1;
-                width: 100%;
-                border-radius: 8px;
-            }
-
+            .header { font-size: 1.2rem; flex-direction: column; gap: 10px; }
+            .search-container { width: 100%; }
+            .container { padding: 10px; height: calc(100vh - 120px); }
+            
             .detail-section {
                 position: fixed;
-                bottom: 0;
-                left: 0;
-                width: 100%;
-                height: 85vh;
+                bottom: 0; left: 0; width: 100%; height: 90vh;
                 z-index: 100;
                 border-radius: 20px 20px 0 0;
                 border-top: 2px solid var(--neon-green);
-                box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.95), 0 -5px 25px var(--border-glow);
+                background: rgba(5,5,5,0.98);
+                backdrop-filter: blur(15px);
                 transform: translateY(105%);
-                padding: 25px 20px;
-                background: #090909;
+                transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             }
-
-            .detail-section.god-tier-active {
-                border-top: 2px solid var(--neon-red);
-                box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.95), 0 -5px 25px rgba(255, 7, 58, 0.4);
-            }
-
-            .detail-section.mobile-open {
-                transform: translateY(0);
-            }
-
-            .detail-hud-actions {
-                display: flex;
-            }
-
-            .profile-img-container {
-                width: 180px;
-                height: 180px;
-                margin-bottom: 20px;
-            }
-
-            .profile-name {
-                font-size: 1.8rem;
-            }
-
-            .profile-score {
-                font-size: 1.3rem;
-                margin-bottom: 15px;
-            }
-
-            .profile-desc {
-                font-size: 1.05rem;
-                max-width: 100%;
-            }
-
-            #empty-state {
-                display: none;
-            }
+            .detail-section.god-tier-active { border-top-color: var(--neon-red); }
+            .detail-section.mobile-open { transform: translateY(0); }
+            .detail-hud-actions { display: flex; }
+            #empty-state { display: none; }
         }
     </style>
 </head>
 <body>
 
-    <div class="header">// CHUD_RANKINGS_</div>
+    <div class="header">
+        <span>// CHUD_MATRIX_OS</span>
+        <div class="search-container">
+            <input type="text" id="search-bar" class="search-bar" placeholder="SEARCH DATABASE...">
+        </div>
+    </div>
 
     <div class="container">
         <!-- Scrollable Leaderboard List -->
@@ -389,121 +480,236 @@
         <!-- Pop-Up Tactical Detail View Terminal -->
         <div class="detail-section" id="detail-terminal">
             <div class="detail-hud-actions">
-                <button class="close-btn" id="close-terminal">Back to List</button>
+                <button class="close-btn" id="close-terminal">CLOSE HUD</button>
             </div>
 
-            <div id="empty-state">SELECT SUBJECT FOR ANALYTICS</div>
+            <div id="empty-state">
+                <div style="font-size: 3rem; margin-bottom:10px;">?</div>
+                AWAITING SUBJECT OVERRIDE
+            </div>
             
             <div id="profile-content">
                 <div class="profile-img-container">
-                    <img id="display-img" class="profile-img" src="" alt="Face" onerror="this.src='https://via.placeholder.com/250/090909/39ff14?text=NO+DOSSIER+IMG'">
+                    <img id="display-img" class="profile-img" src="" alt="Face">
                 </div>
                 <h1 id="display-name" class="profile-name">Name</h1>
-                <div class="profile-score">SCORE: <span id="display-score">0</span></div>
+                
+                <!-- New Interactive Vote Console -->
+                <div class="vote-console" id="vote-console">
+                    <button class="vote-btn down" id="vote-down">▼</button>
+                    <div class="profile-score" id="display-score">0</div>
+                    <button class="vote-btn up" id="vote-up">▲</button>
+                </div>
+
+                <!-- Rank 0 only score display (No votes) -->
+                <div class="profile-score" id="display-score-locked" style="display:none; margin-bottom: 25px;">0</div>
+
                 <p id="display-desc" class="profile-desc">Description goes here.</p>
+
+                <!-- Diagnostics Bars -->
+                <div class="stats-container">
+                    <div class="stat-row">
+                        <div class="stat-labels"><span>Aura Resonance</span><span id="stat-aura-val">0%</span></div>
+                        <div class="stat-bar-bg"><div class="stat-bar-fill" id="stat-aura-bar"></div></div>
+                    </div>
+                    <div class="stat-row">
+                        <div class="stat-labels"><span>Toxicity Levels</span><span id="stat-tox-val">0%</span></div>
+                        <div class="stat-bar-bg"><div class="stat-bar-fill" id="stat-tox-bar"></div></div>
+                    </div>
+                    <div class="stat-row">
+                        <div class="stat-labels"><span>Raw Power</span><span id="stat-pow-val">0%</span></div>
+                        <div class="stat-bar-bg"><div class="stat-bar-fill" id="stat-pow-bar"></div></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // --- HARDCODED DATA CONFIGURATIONS ---
-        // Rank #0 sits perfectly at index 0 with a score of 100.
-        const chudData = [
-            { name: "Darius and Vidhur", score: 100, desc: "System Sovereigns. Their absolute data structures completely shattered the baseline metrics of the ranking core.", img: "images/0.jpg" },
-            { name: "Chudley", score: 99, desc: "An absolute unit. Emits pure radioactive power cells.", img: "images/1.jpg" },
-            { name: "GigaChud", score: 98, desc: "Jawline completely sharper than a diamond pickaxe.", img: "images/2.jpg" },
-            { name: "Barnaby", score: 95, desc: "Eats structural drywall panels for breakfast.", img: "images/3.jpg" },
-            { name: "Grumbo", score: 92, desc: "Has not detected standard sunlight levels since 2018.", img: "images/4.jpg" },
-            { name: "Zonk", score: 90, desc: "Operates entirely on automated synthetic gamer fuel.", img: "images/5.jpg" },
-            { name: "Blorp", score: 88, desc: "Keyboard layout is entirely missing its WASD keys.", img: "images/6.jpg" },
-            { name: "MegaGamer", score: 85, desc: "Permanently banned from 14 different sub-sectors.", img: "images/7.jpg" },
-            { name: "Snorkel", score: 84, desc: "Maintains heavy tactical trench coat during summer heat.", img: "images/8.jpg" },
-            { name: "Puck", score: 82, desc: "Sustained completely on micro-engineered instant ramen.", img: "images/9.jpg" },
-            { name: "Vortex", score: 80, desc: "Claims to have repeatedly bypassed the local mainframe.", img: "images/10.jpg" }
+        // Data Structure (Includes IDs for tracking after sorting)
+        let chudData = [
+            { id: "god_0", name: "Darius, Vidhur & Mukil", score: 0, desc: "System Sovereigns. Their collective data structures completely overflowed the matrix, permanently breaking the system. Voting logic immune.", img: "images/0.jpg", aura: 999, tox: 999, pow: 999 },
+            { id: "c_1", name: "Sofiane Moundir", score: 99, desc: "The ultimate walking paradox. Undeniably the biggest chud to ever roam the matrix, yet radiates absolute legendary Chad energy. A complete anomaly.", img: "images/1.jpg", aura: 99, tox: 85, pow: 100 },
+            { id: "c_2", name: "Chudley", score: 98, desc: "An absolute unit. Emits pure radioactive power cells.", img: "images/2.jpg", aura: 80, tox: 90, pow: 95 },
+            { id: "c_3", name: "GigaChud", score: 97, desc: "Jawline completely sharper than a diamond pickaxe.", img: "images/3.jpg", aura: 95, tox: 40, pow: 98 },
+            { id: "c_4", name: "Barnaby", score: 95, desc: "Eats structural drywall panels for breakfast.", img: "images/4.jpg", aura: 70, tox: 95, pow: 88 },
+            { id: "c_5", name: "Grumbo", score: 92, desc: "Has not detected standard sunlight levels since 2018.", img: "images/5.jpg", aura: 40, tox: 99, pow: 70 },
+            { id: "c_6", name: "Zonk", score: 90, desc: "Operates entirely on automated synthetic gamer fuel.", img: "images/6.jpg", aura: 60, tox: 80, pow: 85 },
+            { id: "c_7", name: "Blorp", score: 88, desc: "Keyboard layout is entirely missing its WASD keys.", img: "images/7.jpg", aura: 30, tox: 100, pow: 50 },
+            { id: "c_8", name: "MegaGamer", score: 85, desc: "Permanently banned from 14 different sub-sectors.", img: "images/8.jpg", aura: 55, tox: 100, pow: 75 },
+            { id: "c_9", name: "Snorkel", score: 84, desc: "Maintains heavy tactical trench coat during summer heat.", img: "images/9.jpg", aura: 45, tox: 60, pow: 60 },
+            { id: "c_10", name: "Puck", score: 82, desc: "Sustained completely on micro-engineered instant ramen.", img: "images/10.jpg", aura: 35, tox: 75, pow: 55 }
         ];
 
-        // Safely generate the remaining entries down to 70 total example slots
-        const genericPrefixes = ["Hex", "Cipher", "Viper", "Glitch", "Acid", "Static", "Titan", "Null"];
+        // Generate the rest
+        const genericPrefixes = ["Hex", "Cipher", "Viper", "Glitch", "Acid", "Static", "Titan", "Null", "Byte", "Mecha"];
         for(let i = 11; i <= 70; i++) {
-            let computedName = genericPrefixes[i % genericPrefixes.length] + "_" + i;
             chudData.push({
-                name: computedName,
+                id: `gen_${i}`,
+                name: genericPrefixes[i % genericPrefixes.length] + "_" + i,
                 score: Math.floor(Math.random() * 41) + 35,
-                desc: `System data file [${i}] currently uninitialized. Subject analysis tracking parameters pending clear field data input...`,
-                img: `images/${i}.jpg`
+                desc: `System data file [${i}] currently uninitialized. Field data pending...`,
+                img: `images/${i}.jpg`,
+                aura: Math.floor(Math.random() * 80) + 10,
+                tox: Math.floor(Math.random() * 80) + 10,
+                pow: Math.floor(Math.random() * 80) + 10
             });
         }
 
-        // Keep sorting fully structured (100 automatically sits at the top)
-        chudData.sort((a, b) => b.score - a.score);
-
+        // DOM Elements
         const listContainer = document.getElementById('list-container');
         const detailTerminal = document.getElementById('detail-terminal');
         const emptyState = document.getElementById('empty-state');
         const profileContent = document.getElementById('profile-content');
+        const searchBar = document.getElementById('search-bar');
         
         const displayImg = document.getElementById('display-img');
         const displayName = document.getElementById('display-name');
         const displayScore = document.getElementById('display-score');
+        const displayScoreLocked = document.getElementById('display-score-locked');
         const displayDesc = document.getElementById('display-desc');
-        const closeTerminalBtn = document.getElementById('close-terminal');
+        const voteConsole = document.getElementById('vote-console');
+        
+        // Stat Bars
+        const sAuraBar = document.getElementById('stat-aura-bar');
+        const sAuraVal = document.getElementById('stat-aura-val');
+        const sToxBar = document.getElementById('stat-tox-bar');
+        const sToxVal = document.getElementById('stat-tox-val');
+        const sPowBar = document.getElementById('stat-pow-bar');
+        const sPowVal = document.getElementById('stat-pow-val');
 
-        let activeItem = null;
+        let activeSubjectId = null;
+        let searchQuery = "";
 
-        // Populate Interface Leaderboard
-        chudData.forEach((chud, index) => {
-            const item = document.createElement('div');
-            
-            // Check if this is the god-tier score element to attach glitch aesthetics
-            const isGodTier = chud.score === 100;
-            item.className = `rank-item ${isGodTier ? 'god-tier' : ''}`;
-            
-            // Render index cleanly (0 for Darius/Vidhur, 1, 2, 3... for the rest)
-            item.innerHTML = `
-                <div class="rank-number">#${index}</div>
-                <div class="rank-name">${chud.name}</div>
-                <div class="rank-score-mini">${chud.score}</div>
-            `;
-            
-            item.addEventListener('click', () => {
-                if(activeItem) activeItem.classList.remove('active');
-                item.classList.add('active');
-                activeItem = item;
+        // Core Sorting Logic (Rank 0 is permanently untouched)
+        function sortMatrix() {
+            const godTier = chudData[0];
+            const mortals = chudData.slice(1);
+            // Sort mortals by score highest to lowest
+            mortals.sort((a, b) => b.score - a.score);
+            chudData = [godTier, ...mortals];
+        }
 
-                if(emptyState) emptyState.style.display = 'none';
-                profileContent.style.display = 'flex';
+        // Render Leaderboard
+        function renderList() {
+            // Save scroll position to prevent jumping
+            const currentScroll = listContainer.scrollTop;
+            listContainer.innerHTML = '';
 
-                // Map content into variables
-                displayImg.src = chud.img;
-                displayName.textContent = chud.name;
-                displayScore.textContent = chud.score;
-                displayDesc.textContent = chud.desc;
+            // Filter data based on search bar
+            const filteredData = chudData.filter(chud => 
+                chud.name.toLowerCase().includes(searchQuery.toLowerCase())
+            );
 
-                // Adjust color theme dynamically if Rank #0 is open
-                if(isGodTier) {
-                    detailTerminal.classList.add('god-tier-active');
-                    // Fallback placeholder image handling for Rank 0
-                    displayImg.onerror = function() { this.src = 'https://via.placeholder.com/250/090909/ff073a?text=SYSTEM+BREAKERS'; };
-                } else {
-                    detailTerminal.classList.remove('god-tier-active');
-                    displayImg.onerror = function() { this.src = 'https://via.placeholder.com/250/090909/39ff14?text=NO+DOSSIER+IMG'; };
-                }
+            filteredData.forEach((chud) => {
+                // Find actual global index for ranking number
+                const realIndex = chudData.findIndex(c => c.id === chud.id);
+                const isGodTier = realIndex === 0;
 
-                // Handle Mobile view drawer slide-up
-                detailTerminal.classList.add('mobile-open');
+                const item = document.createElement('div');
+                item.className = `rank-item ${isGodTier ? 'god-tier' : ''} ${chud.id === activeSubjectId ? 'active' : ''}`;
+                // Stagger animation based on index
+                item.style.animationDelay = `${(realIndex % 15) * 0.03}s`; 
+                
+                item.innerHTML = `
+                    <div class="rank-number">#${realIndex}</div>
+                    <div class="rank-name">${chud.name}</div>
+                    <div class="rank-score-mini">${chud.score}</div>
+                `;
+                
+                item.addEventListener('click', () => loadDossier(chud.id));
+                listContainer.appendChild(item);
             });
 
-            listContainer.appendChild(item);
+            // Restore scroll
+            listContainer.scrollTop = currentScroll;
+        }
+
+        function loadDossier(id) {
+            activeSubjectId = id;
+            const chud = chudData.find(c => c.id === id);
+            const isGodTier = chudData.indexOf(chud) === 0;
+
+            // Re-render list to highlight active item
+            renderList();
+
+            // Setup UI
+            emptyState.style.display = 'none';
+            profileContent.style.display = 'flex';
+            detailTerminal.classList.add('mobile-open');
+
+            // Inject Data
+            displayName.textContent = chud.name;
+            displayDesc.textContent = chud.desc;
+            
+            // Image Fallbacks
+            displayImg.src = chud.img;
+            if(isGodTier) {
+                detailTerminal.classList.add('god-tier-active');
+                displayImg.onerror = function() { this.src = 'https://via.placeholder.com/250/050505/ff073a?text=ERROR:OVERFLOW'; };
+                voteConsole.style.display = 'none';
+                displayScoreLocked.style.display = 'block';
+                displayScoreLocked.textContent = chud.score;
+            } else {
+                detailTerminal.classList.remove('god-tier-active');
+                displayImg.onerror = function() { this.src = 'https://via.placeholder.com/250/050505/39ff14?text=NO+DATA'; };
+                voteConsole.style.display = 'flex';
+                displayScoreLocked.style.display = 'none';
+                displayScore.textContent = chud.score;
+            }
+
+            // Animate Stat Bars (Reset to 0 first, then expand)
+            setTimeout(() => {
+                const maxStat = isGodTier ? 999 : 100;
+                
+                sAuraBar.style.width = isGodTier ? '100%' : `${chud.aura}%`;
+                sAuraVal.textContent = isGodTier ? 'ERROR' : `${chud.aura}%`;
+
+                sToxBar.style.width = isGodTier ? '100%' : `${chud.tox}%`;
+                sToxVal.textContent = isGodTier ? 'ERROR' : `${chud.tox}%`;
+
+                sPowBar.style.width = isGodTier ? '100%' : `${chud.pow}%`;
+                sPowVal.textContent = isGodTier ? 'ERROR' : `${chud.pow}%`;
+            }, 50);
+        }
+
+        // Voting Logic
+        function handleVote(delta) {
+            if (!activeSubjectId) return;
+            const chudIndex = chudData.findIndex(c => c.id === activeSubjectId);
+            
+            // Prevent voting on Rank 0
+            if (chudIndex === 0) return;
+
+            // Update Score
+            chudData[chudIndex].score += delta;
+            
+            // Update Dossier Score text immediately with a cool flash effect
+            displayScore.textContent = chudData[chudIndex].score;
+            displayScore.style.textShadow = delta > 0 ? '0 0 30px #fff' : '0 0 30px var(--neon-red)';
+            setTimeout(() => displayScore.style.textShadow = '', 200);
+
+            // Resort Matrix and Re-render UI
+            sortMatrix();
+            renderList();
+        }
+
+        // Event Listeners
+        document.getElementById('vote-up').addEventListener('click', () => handleVote(1));
+        document.getElementById('vote-down').addEventListener('click', () => handleVote(-1));
+        
+        searchBar.addEventListener('input', (e) => {
+            searchQuery = e.target.value;
+            renderList();
         });
 
-        // Close drawer (Mobile feature)
-        closeTerminalBtn.addEventListener('click', () => {
+        document.getElementById('close-terminal').addEventListener('click', () => {
             detailTerminal.classList.remove('mobile-open');
-            if(activeItem) {
-                activeItem.classList.remove('active');
-                activeItem = null;
-            }
         });
+
+        // Initial Boot Sequence
+        sortMatrix();
+        renderList();
     </script>
 </body>
 </html>
