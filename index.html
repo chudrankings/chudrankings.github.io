@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chud Rankings: Overdrive</title>
+    <title>Chud Rankings</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700;900&display=swap');
 
@@ -256,7 +256,7 @@
 <body>
 
     <div class="header">
-        <span id="header-text">// CHUD_MATRIX_OS</span>
+        <span id="header-text">// CHUD_RANKINGS_</span>
         <div class="search-container">
             <input type="text" id="search-bar" class="search-bar" placeholder="SEARCH DATABASE...">
         </div>
@@ -472,7 +472,7 @@
             if (searchQuery === '//ADMIN') {
                 isAdminMode = !isAdminMode;
                 document.body.classList.toggle('admin-mode', isAdminMode);
-                document.getElementById('header-text').textContent = isAdminMode ? '// CHUD_MATRIX_ADMIN_MODE' : '// CHUD_MATRIX_OS';
+                document.getElementById('header-text').textContent = isAdminMode ? '// CHUD_RANKINGS_ADMIN_MODE' : '// CHUD_MATRIX_OS';
                 showToast(isAdminMode ? "ADMIN PRIVILEGES GRANTED" : "ADMIN LOGGED OUT", "admin");
                 
                 searchBar.value = '';
@@ -492,7 +492,7 @@
             chudData[chudIndex].score += delta;
             sortMatrix();
             loadDossier(activeSubjectId);
-            showToast("MATRIX SCORE OVERRIDDEN", "admin");
+            showToast("RANKINGS SCORE OVERRIDDEN", "admin");
         }
 
         document.getElementById('admin-plus').addEventListener('click', () => adminChangeScore(1));
