@@ -41,7 +41,6 @@
             transition: all 0.4s ease;
         }
         
-        /* Clickable Exit Title */
         #system-title { cursor: pointer; user-select: none; }
         body.admin-mode .header { color: var(--neon-admin); text-shadow: 0 0 15px var(--neon-admin); border-bottom-color: var(--neon-admin); }
 
@@ -80,7 +79,15 @@
         .rank-number { font-family: 'Orbitron', sans-serif; color: var(--neon-green); font-size: 1.1rem; font-weight: 700; width: 45px; }
         body.admin-mode .rank-number { color: var(--neon-admin); }
         .rank-item.god-tier .rank-number { color: var(--neon-red); }
+        
         .rank-name { flex: 1; font-size: 1.3rem; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        
+        /* Public Voting Mini Displays (Hidden from non-admins by default, or keep them subtle) */
+        .vote-tallies { display: flex; gap: 8px; margin-right: 15px; font-family: 'Orbitron', sans-serif; font-size: 0.8rem; font-weight: 700; }
+        .tally-up { color: var(--neon-green); opacity: 0.6; }
+        .tally-down { color: var(--neon-red); opacity: 0.6; }
+        .rank-item.active .tally-up, .rank-item.active .tally-down { opacity: 1; }
+
         .rank-score-mini { font-family: 'Orbitron', sans-serif; background: #000; padding: 3px 10px; border-radius: 4px; font-weight: 900; border: 1px solid #333; min-width: 45px; text-align: center; }
         .rank-item.active .rank-score-mini { border-color: var(--neon-green); color: var(--neon-green); }
         body.admin-mode .rank-item.active .rank-score-mini { border-color: var(--neon-admin); color: var(--neon-admin); }
@@ -139,7 +146,6 @@
             font-family: 'Orbitron', sans-serif; font-size: 0.65rem; color: transparent;
             text-align: right; caret-color: transparent;
         }
-        /* When authorized, subtly reveal the input text */
         body.admin-mode .stealth-input { color: rgba(188, 19, 254, 0.2); }
     </style>
 </head>
@@ -165,11 +171,13 @@
                 <h1 id="p-name" class="profile-name">---</h1>
                 <div class="profile-score">SCORE: <span id="p-score">0</span></div>
 
+                <!-- Live Public Interaction Node -->
                 <div class="vote-console" id="public-console">
                     <button class="vote-btn up" id="btn-up">▲ UPVOTE</button>
                     <button class="vote-btn down" id="btn-down">▼ DOWNVOTE</button>
                 </div>
 
+                <!-- Dedicated Admin Shift System -->
                 <div class="admin-override-box">
                     <div style="font-family:'Orbitron'; color:var(--neon-admin); font-size:0.8rem; letter-spacing:1px;">CORE DATABASE OVERRIDE</div>
                     <div class="admin-btn-group">
@@ -190,80 +198,24 @@
     </div>
 
     <script>
-        // DATA MATRIX ARCHIVE: CONFIGURE ALL 70 RANKS HERE
+        // ARCHIVE DATA STREAM: Upvotes & Downvotes run isolated from core score values
         let rankingsData = [
-            { id: "rank_0", name: "Darius, Vidhur, & Mukil", score: 0, desc: "System Sovereigns. Their data broken. Voting logic immune.", img: "images/0.jpg" },
-            { id: "rank_1", name: "Sofiane Moundir", score: 99, desc: "The ultimate walking paradox. Undeniably the biggest chud, yet radiates Chad energy.", img: "images/1.jpg" },
-            { id: "rank_2", name: "Chudley", score: 98, desc: "An absolute unit. Emits pure radioactive power cells.", img: "images/2.jpg" },
-            { id: "rank_3", name: "GigaChud", score: 97, desc: "Jawline completely sharper than a diamond pickaxe.", img: "images/3.jpg" },
-            { id: "rank_4", name: "Barnaby", score: 95, desc: "Eats structural drywall panels for breakfast.", img: "images/4.jpg" },
+            { id: "rank_0", name: "Darius, Vidhur, & Mukil", score: 0, upvotes: 0, downvotes: 0, desc: "System Sovereigns. Their data broken. Voting logic immune.", img: "images/0.jpg" },
+            { id: "rank_1", name: "Sofiane Moundir", score: 99, upvotes: 0, downvotes: 0, desc: "The ultimate walking paradox. Undeniably the biggest chud, yet radiates Chad energy.", img: "images/1.jpg" },
+            { id: "rank_2", name: "Chudley", score: 98, upvotes: 0, downvotes: 0, desc: "An absolute unit. Emits pure radioactive power cells.", img: "images/2.jpg" },
+            { id: "rank_3", name: "GigaChud", score: 97, upvotes: 0, downvotes: 0, desc: "Jawline completely sharper than a diamond pickaxe.", img: "images/3.jpg" },
+            { id: "rank_4", name: "Barnaby", score: 95, upvotes: 0, downvotes: 0, desc: "Eats structural drywall panels for breakfast.", img: "images/4.jpg" },
             
-            // PLACEHOLDERS FOR RANKS 5 TO 69
-            { id: "rank_5", name: "Subject_5", score: 90, desc: "Data file uninitialized.", img: "images/5.jpg" },
-            { id: "rank_6", name: "Subject_6", score: 88, desc: "Data file uninitialized.", img: "images/6.jpg" },
-            { id: "rank_7", name: "Subject_7", score: 85, desc: "Data file uninitialized.", img: "images/7.jpg" },
-            { id: "rank_8", name: "Subject_8", score: 83, desc: "Data file uninitialized.", img: "images/8.jpg" },
-            { id: "rank_9", name: "Subject_9", score: 80, desc: "Data file uninitialized.", img: "images/9.jpg" },
-            { id: "rank_10", name: "Subject_10", score: 78, desc: "Data file uninitialized.", img: "images/10.jpg" },
-            { id: "rank_11", name: "Subject_11", score: 75, desc: "Data file uninitialized.", img: "images/11.jpg" },
-            { id: "rank_12", name: "Subject_12", score: 73, desc: "Data file uninitialized.", img: "images/12.jpg" },
-            { id: "rank_13", name: "Subject_13", score: 70, desc: "Data file uninitialized.", img: "images/13.jpg" },
-            { id: "rank_14", name: "Subject_14", score: 68, desc: "Data file uninitialized.", img: "images/14.jpg" },
-            { id: "rank_15", name: "Subject_15", score: 65, desc: "Data file uninitialized.", img: "images/15.jpg" },
-            { id: "rank_16", name: "Subject_16", score: 63, desc: "Data file uninitialized.", img: "images/16.jpg" },
-            { id: "rank_17", name: "Subject_17", score: 60, desc: "Data file uninitialized.", img: "images/17.jpg" },
-            { id: "rank_18", name: "Subject_18", score: 58, desc: "Data file uninitialized.", img: "images/18.jpg" },
-            { id: "rank_19", name: "Subject_19", score: 55, desc: "Data file uninitialized.", img: "images/19.jpg" },
-            { id: "rank_20", name: "Subject_20", score: 53, desc: "Data file uninitialized.", img: "images/20.jpg" },
-            { id: "rank_21", name: "Subject_21", score: 50, desc: "Data file uninitialized.", img: "images/21.jpg" },
-            { id: "rank_22", name: "Subject_22", score: 48, desc: "Data file uninitialized.", img: "images/22.jpg" },
-            { id: "rank_23", name: "Subject_23", score: 45, desc: "Data file uninitialized.", img: "images/23.jpg" },
-            { id: "rank_24", name: "Subject_24", score: 43, desc: "Data file uninitialized.", img: "images/24.jpg" },
-            { id: "rank_25", name: "Subject_25", score: 40, desc: "Data file uninitialized.", img: "images/25.jpg" },
-            { id: "rank_26", name: "Subject_26", score: 38, desc: "Data file uninitialized.", img: "images/26.jpg" },
-            { id: "rank_27", name: "Subject_27", score: 35, desc: "Data file uninitialized.", img: "images/27.jpg" },
-            { id: "rank_28", name: "Subject_28", score: 33, desc: "Data file uninitialized.", img: "images/28.jpg" },
-            { id: "rank_29", name: "Subject_29", score: 30, desc: "Data file uninitialized.", img: "images/29.jpg" },
-            { id: "rank_30", name: "Subject_30", score: 28, desc: "Data file uninitialized.", img: "images/30.jpg" },
-            { id: "rank_31", name: "Subject_31", score: 25, desc: "Data file uninitialized.", img: "images/31.jpg" },
-            { id: "rank_32", name: "Subject_32", score: 23, desc: "Data file uninitialized.", img: "images/32.jpg" },
-            { id: "rank_33", name: "Subject_33", score: 20, desc: "Data file uninitialized.", img: "images/33.jpg" },
-            { id: "rank_34", name: "Subject_34", score: 18, desc: "Data file uninitialized.", img: "images/34.jpg" },
-            { id: "rank_35", name: "Subject_35", score: 15, desc: "Data file uninitialized.", img: "images/35.jpg" },
-            { id: "rank_36", name: "Subject_36", score: 13, desc: "Data file uninitialized.", img: "images/36.jpg" },
-            { id: "rank_37", name: "Subject_37", score: 10, desc: "Data file uninitialized.", img: "images/37.jpg" },
-            { id: "rank_38", name: "Subject_38", score: 8,  desc: "Data file uninitialized.", img: "images/38.jpg" },
-            { id: "rank_39", name: "Subject_39", score: 5,  desc: "Data file uninitialized.", img: "images/39.jpg" },
-            { id: "rank_40", name: "Subject_40", score: 4,  desc: "Data file uninitialized.", img: "images/40.jpg" },
-            { id: "rank_41", name: "Subject_41", score: 3,  desc: "Data file uninitialized.", img: "images/41.jpg" },
-            { id: "rank_42", name: "Subject_42", score: 2,  desc: "Data file uninitialized.", img: "images/42.jpg" },
-            { id: "rank_43", name: "Subject_43", score: 1,  desc: "Data file uninitialized.", img: "images/43.jpg" },
-            { id: "rank_44", name: "Subject_44", score: 0,  desc: "Data file uninitialized.", img: "images/44.jpg" },
-            { id: "rank_45", name: "Subject_45", score: 0,  desc: "Data file uninitialized.", img: "images/45.jpg" },
-            { id: "rank_46", name: "Subject_46", score: 0,  desc: "Data file uninitialized.", img: "images/46.jpg" },
-            { id: "rank_47", name: "Subject_47", score: 0,  desc: "Data file uninitialized.", img: "images/47.jpg" },
-            { id: "rank_48", name: "Subject_48", score: 0,  desc: "Data file uninitialized.", img: "images/48.jpg" },
-            { id: "rank_49", name: "Subject_49", score: 0,  desc: "Data file uninitialized.", img: "images/49.jpg" },
-            { id: "rank_50", name: "Subject_50", score: 0,  desc: "Data file uninitialized.", img: "images/50.jpg" },
-            { id: "rank_51", name: "Subject_51", score: 0,  desc: "Data file uninitialized.", img: "images/51.jpg" },
-            { id: "rank_52", name: "Subject_52", score: 0,  desc: "Data file uninitialized.", img: "images/52.jpg" },
-            { id: "rank_53", name: "Subject_53", score: 0,  desc: "Data file uninitialized.", img: "images/53.jpg" },
-            { id: "rank_54", name: "Subject_54", score: 0,  desc: "Data file uninitialized.", img: "images/54.jpg" },
-            { id: "rank_55", name: "Subject_55", score: 0,  desc: "Data file uninitialized.", img: "images/55.jpg" },
-            { id: "rank_56", name: "Subject_56", score: 0,  desc: "Data file uninitialized.", img: "images/56.jpg" },
-            { id: "rank_57", name: "Subject_57", score: 0,  desc: "Data file uninitialized.", img: "images/57.jpg" },
-            { id: "rank_58", name: "Subject_58", score: 0,  desc: "Data file uninitialized.", img: "images/58.jpg" },
-            { id: "rank_59", name: "Subject_59", score: 0,  desc: "Data file uninitialized.", img: "images/59.jpg" },
-            { id: "rank_60", name: "Subject_60", score: 0,  desc: "Data file uninitialized.", img: "images/60.jpg" },
-            { id: "rank_61", name: "Subject_61", score: 0,  desc: "Data file uninitialized.", img: "images/61.jpg" },
-            { id: "rank_62", name: "Subject_62", score: 0,  desc: "Data file uninitialized.", img: "images/62.jpg" },
-            { id: "rank_63", name: "Subject_63", score: 0,  desc: "Data file uninitialized.", img: "images/63.jpg" },
-            { id: "rank_64", name: "Subject_64", score: 0,  desc: "Data file uninitialized.", img: "images/64.jpg" },
-            { id: "rank_65", name: "Subject_65", score: 0,  desc: "Data file uninitialized.", img: "images/65.jpg" },
-            { id: "rank_66", name: "Subject_66", score: 0,  desc: "Data file uninitialized.", img: "images/66.jpg" },
-            { id: "rank_67", name: "Subject_67", score: 0,  desc: "Data file uninitialized.", img: "images/67.jpg" },
-            { id: "rank_68", name: "Subject_68", score: 0,  desc: "Data file uninitialized.", img: "images/68.jpg" },
-            { id: "rank_69", name: "Subject_69", score: 0,  desc: "Data file uninitialized.", img: "images/69.jpg" }
+            // AUTOMATED ALLOCATION SLOTS (5 - 69)
+            ...Array.from({length: 65}, (_, i) => ({
+                id: `rank_${i + 5}`,
+                name: `Subject_${i + 5}`,
+                score: Math.max(0, 90 - (i * 2)),
+                upvotes: 0,
+                downvotes: 0,
+                desc: "Data file uninitialized.",
+                img: `images/${i + 5}.jpg`
+            }))
         ];
 
         const listFrame = document.getElementById('list-frame');
@@ -302,9 +254,15 @@
 
                 const node = document.createElement('div');
                 node.className = `rank-item ${isSovereign ? 'god-tier' : ''} ${item.id === currentActiveId ? 'active' : ''}`;
+                
+                // Show public vote tallies instantly alongside the row item
                 node.innerHTML = `
                     <div class="rank-number">#${originalIndex}</div>
                     <div class="rank-name">${item.name}</div>
+                    <div class="vote-tallies">
+                        <span class="tally-up">▲${item.upvotes}</span>
+                        <span class="tally-down">▼${item.downvotes}</span>
+                    </div>
                     <div class="rank-score-mini">${item.score}</div>
                 `;
                 node.addEventListener('click', () => populateDossier(item.id));
@@ -337,16 +295,16 @@
             }
         }
 
-        // COVERT CORNER INPUT LISTENER
+        // HIDDEN AUTH INGESTION NODE
         covertKey.addEventListener('input', (e) => {
-            if (e.target.value === '1242767') {
+            if (e.target.value === '12467') {
                 adminAuthorized = true;
                 toggleAdminUI();
                 e.target.value = ''; 
             }
         });
 
-        // HIDDEN DEAD MAN'S SWITCH (Click Title to Exit)
+        // HIDDEN SYSTEM PURGE LINK (Click Header to Disengage)
         function disengageOverride() {
             if (!adminAuthorized) return;
             adminAuthorized = false;
@@ -367,8 +325,8 @@
             buildList();
         });
 
-        // 24 HOUR INDEPENDENT COOLDOWN VOTING MATRIX
-        function executeVote(direction) {
+        // PUBLIC VOTING MODULE - Logs votes, doesn't touch base score
+        function executePublicVote(direction) {
             if (!currentActiveId) return;
             const idx = rankingsData.findIndex(c => c.id === currentActiveId);
             if (idx === 0) return;
@@ -383,19 +341,18 @@
                 return;
             }
 
-            if (direction === 'up') rankingsData[idx].score += 1;
-            else rankingsData[idx].score -= 1;
+            if (direction === 'up') rankingsData[idx].upvotes += 1;
+            else rankingsData[idx].downvotes += 1;
 
             localStorage.setItem(trackingKey, targetTime.toString());
-            displayToast(`VOTE SUBMITTED. 24H COOLDOWN INITIATED.`);
-            sortData();
-            populateDossier(currentActiveId);
+            displayToast(`VOTE RECORDED UNDER CURRENT DISPATCH`);
+            buildList(); 
         }
 
-        document.getElementById('btn-up').addEventListener('click', () => executeVote('up'));
-        document.getElementById('btn-down').addEventListener('click', () => executeVote('down'));
+        document.getElementById('btn-up').addEventListener('click', () => executePublicVote('up'));
+        document.getElementById('btn-down').addEventListener('click', () => executePublicVote('down'));
 
-        // LIVE ROOT MODIFICATION CONTROLS
+        // ADMIN EXCLUSIVE DESTRUCTIVE/CONSTRUCTIVE MATRIX SHIFTS
         function forceValueShift(amount) {
             if (!currentActiveId || !adminAuthorized) return;
             const idx = rankingsData.findIndex(c => c.id === currentActiveId);
