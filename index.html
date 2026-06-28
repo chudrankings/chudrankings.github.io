@@ -15,7 +15,7 @@
             --neon-red: #ff073a;
             --neon-admin: #bc13fe;
             --text-main: #ffffff;
-            --text-muted: #666666;
+            --text-muted: #444444;
             --glass-border: rgba(255, 255, 255, 0.05);
         }
 
@@ -40,6 +40,9 @@
             backdrop-filter: blur(10px); z-index: 10; display: flex; justify-content: space-between; align-items: center;
             transition: all 0.4s ease;
         }
+        
+        /* Clickable Exit Title */
+        #system-title { cursor: pointer; user-select: none; }
         body.admin-mode .header { color: var(--neon-admin); text-shadow: 0 0 15px var(--neon-admin); border-bottom-color: var(--neon-admin); }
 
         .search-bar {
@@ -53,22 +56,8 @@
 
         .sidebar-panel {
             flex: 1.2; background: var(--panel-bg); border: 1px solid var(--glass-border); border-radius: 12px;
-            padding: 15px; display: flex; flex-direction: column; gap: 15px; box-shadow: inset 0 0 30px rgba(0,0,0,0.9);
+            padding: 15px; display: flex; flex-direction: column; gap: 15px; box-shadow: inset 0 0 30px rgba(0,0,0,0.9); position: relative;
         }
-
-        /* DEDICATED CODE INPUT PORTAL */
-        .security-portal {
-            background: rgba(0, 0, 0, 0.8); border: 1px dashed var(--neon-green-dim); padding: 12px; border-radius: 6px;
-            display: flex; flex-direction: column; gap: 6px; transition: all 0.3s;
-        }
-        body.admin-mode .security-portal { border-color: var(--neon-admin); background: rgba(188, 19, 254, 0.03); }
-        .security-label { font-family: 'Orbitron', sans-serif; font-size: 0.75rem; color: #aaa; letter-spacing: 1px; }
-        body.admin-mode .security-label { color: var(--neon-admin); }
-        .security-input {
-            width: 100%; background: #000; border: 1px solid #222; color: #fff; font-family: 'Orbitron', sans-serif;
-            padding: 6px 10px; border-radius: 4px; outline: none; letter-spacing: 2px; text-align: center;
-        }
-        body.admin-mode .security-input { border-color: var(--neon-admin); color: var(--neon-admin); }
 
         .list-section { flex: 1; overflow-y: auto; padding-right: 4px; }
         .list-section::-webkit-scrollbar { width: 4px; }
@@ -137,12 +126,27 @@
         .toast.adm { border-color: var(--neon-admin); color: var(--neon-admin); }
 
         #empty-view { display: flex; height: 100%; width: 100%; border: 1px dashed #222; border-radius: 8px; justify-content: center; align-items: center; color: var(--text-muted); font-family: 'Orbitron'; font-size: 1.1rem; }
+
+        /* ABSOLUTE COVERT SECURITY INPUT PORTAL (BOTTOM RIGHT CORNER) */
+        .stealth-portal {
+            position: absolute; bottom: 8px; right: 12px; z-index: 1000;
+            display: flex; align-items: center; gap: 5px; font-family: 'Orbitron', sans-serif;
+            font-size: 0.65rem; color: #222; transition: color 0.3s;
+        }
+        body.admin-mode .stealth-portal { color: rgba(188, 19, 254, 0.2); }
+        .stealth-input {
+            background: transparent; border: none; outline: none; width: 65px;
+            font-family: 'Orbitron', sans-serif; font-size: 0.65rem; color: transparent;
+            text-align: right; caret-color: transparent;
+        }
+        /* When authorized, subtly reveal the input text */
+        body.admin-mode .stealth-input { color: rgba(188, 19, 254, 0.2); }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <span id="system-title">// CHUD_RANKINGS_</span>
+        <span id="system-title" onclick="disengageOverride()">// CHUD_RANKINGS_</span>
         <input type="text" id="search-bar" class="search-bar" placeholder="FILTER TARGETS...">
     </div>
 
@@ -150,12 +154,6 @@
 
     <div class="container">
         <div class="sidebar-panel">
-            <!-- SEPARATE CODES INPUT PORTAL -->
-            <div class="security-portal">
-                <div class="security-label" id="portal-label">SECURITY OVERRIDE PORTAL</div>
-                <input type="password" id="security-key" class="security-input" placeholder="ENTER ACCESS CODE">
-            </div>
-            
             <div class="list-section" id="list-frame"></div>
         </div>
 
@@ -167,13 +165,11 @@
                 <h1 id="p-name" class="profile-name">---</h1>
                 <div class="profile-score">SCORE: <span id="p-score">0</span></div>
 
-                <!-- Live Public Buttons -->
                 <div class="vote-console" id="public-console">
                     <button class="vote-btn up" id="btn-up">▲ UPVOTE</button>
                     <button class="vote-btn down" id="btn-down">▼ DOWNVOTE</button>
                 </div>
 
-                <!-- Dedicated Override Interface -->
                 <div class="admin-override-box">
                     <div style="font-family:'Orbitron'; color:var(--neon-admin); font-size:0.8rem; letter-spacing:1px;">CORE DATABASE OVERRIDE</div>
                     <div class="admin-btn-group">
@@ -188,89 +184,91 @@
         </div>
     </div>
 
+    <div class="stealth-portal">
+        <span>v2.6.1-PRIME_</span>
+        <input type="password" id="covert-key" class="stealth-input" maxlength="7" autocomplete="off">
+    </div>
+
     <script>
-        // =========================================================================
         // DATA MATRIX ARCHIVE: CONFIGURE ALL 70 RANKS HERE
-        // =========================================================================
         let rankingsData = [
-            { id: "rank_0", name: "Darius, Vidhur, & Mukil", score: 0, desc: "System Sovereigns. Their collective data structures completely overflowed the matrix, permanently breaking the system. Voting logic immune.", img: "images/0.jpg" },
-            { id: "rank_1", name: "Sofiane Moundir", score: 99, desc: "The ultimate walking paradox. Undeniably the biggest chud to ever roam the matrix, yet radiates absolute legendary Chad energy.", img: "images/1.jpg" },
+            { id: "rank_0", name: "Darius, Vidhur, & Mukil", score: 0, desc: "System Sovereigns. Their data broken. Voting logic immune.", img: "images/0.jpg" },
+            { id: "rank_1", name: "Sofiane Moundir", score: 99, desc: "The ultimate walking paradox. Undeniably the biggest chud, yet radiates Chad energy.", img: "images/1.jpg" },
             { id: "rank_2", name: "Chudley", score: 98, desc: "An absolute unit. Emits pure radioactive power cells.", img: "images/2.jpg" },
             { id: "rank_3", name: "GigaChud", score: 97, desc: "Jawline completely sharper than a diamond pickaxe.", img: "images/3.jpg" },
             { id: "rank_4", name: "Barnaby", score: 95, desc: "Eats structural drywall panels for breakfast.", img: "images/4.jpg" },
             
-            // PLACEHOLDERS FOR RANKS 5 TO 69 (TOTAL 70 MEMBERS)
-            // Simply update the names, scores, and descriptions directly inside these objects!
-            { id: "rank_5", name: "Subject_5", score: 90, desc: "Data file uninitialized. Awaiting core input updates.", img: "images/5.jpg" },
-            { id: "rank_6", name: "Subject_6", score: 88, desc: "Data file uninitialized. Awaiting core input updates.", img: "images/6.jpg" },
-            { id: "rank_7", name: "Subject_7", score: 85, desc: "Data file uninitialized. Awaiting core input updates.", img: "images/7.jpg" },
-            { id: "rank_8", name: "Subject_8", score: 83, desc: "Data file uninitialized. Awaiting core input updates.", img: "images/8.jpg" },
-            { id: "rank_9", name: "Subject_9", score: 80, desc: "Data file uninitialized. Awaiting core input updates.", img: "images/9.jpg" },
-            { id: "rank_10", name: "Subject_10", score: 78, desc: "Data file uninitialized. Awaiting core input updates.", img: "images/10.jpg" },
-            { id: "rank_11", name: "Subject_11", score: 75, desc: "Data file uninitialized. Awaiting core input updates.", img: "images/11.jpg" },
-            { id: "rank_12", name: "Subject_12", score: 73, desc: "Data file uninitialized. Awaiting core input updates.", img: "images/12.jpg" },
-            { id: "rank_13", name: "Subject_13", score: 70, desc: "Data file uninitialized. Awaiting core input updates.", img: "images/13.jpg" },
-            { id: "rank_14", name: "Subject_14", score: 68, desc: "Data file uninitialized. Awaiting core input updates.", img: "images/14.jpg" },
-            { id: "rank_15", name: "Subject_15", score: 65, desc: "Data file uninitialized. Awaiting core input updates.", img: "images/15.jpg" },
-            { id: "rank_16", name: "Subject_16", score: 63, desc: "Data file uninitialized. Awaiting core input updates.", img: "images/16.jpg" },
-            { id: "rank_17", name: "Subject_17", score: 60, desc: "Data file uninitialized. Awaiting core input updates.", img: "images/17.jpg" },
-            { id: "rank_18", name: "Subject_18", score: 58, desc: "Data file uninitialized. Awaiting core input updates.", img: "images/18.jpg" },
-            { id: "rank_19", name: "Subject_19", score: 55, desc: "Data file uninitialized. Awaiting core input updates.", img: "images/19.jpg" },
-            { id: "rank_20", name: "Subject_20", score: 53, desc: "Data file uninitialized. Awaiting core input updates.", img: "images/20.jpg" },
-            { id: "rank_21", name: "Subject_21", score: 50, desc: "Data file uninitialized. Awaiting core input updates.", img: "images/21.jpg" },
-            { id: "rank_22", name: "Subject_22", score: 48, desc: "Data file uninitialized. Awaiting core input updates.", img: "images/22.jpg" },
-            { id: "rank_23", name: "Subject_23", score: 45, desc: "Data file uninitialized. Awaiting core input updates.", img: "images/23.jpg" },
-            { id: "rank_24", name: "Subject_24", score: 43, desc: "Data file uninitialized. Awaiting core input updates.", img: "images/24.jpg" },
-            { id: "rank_25", name: "Subject_25", score: 40, desc: "Data file uninitialized. Awaiting core input updates.", img: "images/25.jpg" },
-            { id: "rank_26", name: "Subject_26", score: 38, desc: "Data file uninitialized. Awaiting core input updates.", img: "images/26.jpg" },
-            { id: "rank_27", name: "Subject_27", score: 35, desc: "Data file uninitialized. Awaiting core input updates.", img: "images/27.jpg" },
-            { id: "rank_28", name: "Subject_28", score: 33, desc: "Data file uninitialized. Awaiting core input updates.", img: "images/28.jpg" },
-            { id: "rank_29", name: "Subject_29", score: 30, desc: "Data file uninitialized. Awaiting core input updates.", img: "images/29.jpg" },
-            { id: "rank_30", name: "Subject_30", score: 28, desc: "Data file uninitialized. Awaiting core input updates.", img: "images/30.jpg" },
-            { id: "rank_31", name: "Subject_31", score: 25, desc: "Data file uninitialized. Awaiting core input updates.", img: "images/31.jpg" },
-            { id: "rank_32", name: "Subject_32", score: 23, desc: "Data file uninitialized. Awaiting core input updates.", img: "images/32.jpg" },
-            { id: "rank_33", name: "Subject_33", score: 20, desc: "Data file uninitialized. Awaiting core input updates.", img: "images/33.jpg" },
-            { id: "rank_34", name: "Subject_34", score: 18, desc: "Data file uninitialized. Awaiting core input updates.", img: "images/34.jpg" },
-            { id: "rank_35", name: "Subject_35", score: 15, desc: "Data file uninitialized. Awaiting core input updates.", img: "images/35.jpg" },
-            { id: "rank_36", name: "Subject_36", score: 13, desc: "Data file uninitialized. Awaiting core input updates.", img: "images/36.jpg" },
-            { id: "rank_37", name: "Subject_37", score: 10, desc: "Data file uninitialized. Awaiting core input updates.", img: "images/37.jpg" },
-            { id: "rank_38", name: "Subject_38", score: 8,  desc: "Data file uninitialized. Awaiting core input updates.", img: "images/38.jpg" },
-            { id: "rank_39", name: "Subject_39", score: 5,  desc: "Data file uninitialized. Awaiting core input updates.", img: "images/39.jpg" },
-            { id: "rank_40", name: "Subject_40", score: 4,  desc: "Data file uninitialized. Awaiting core input updates.", img: "images/40.jpg" },
-            { id: "rank_41", name: "Subject_41", score: 3,  desc: "Data file uninitialized. Awaiting core input updates.", img: "images/41.jpg" },
-            { id: "rank_42", name: "Subject_42", score: 2,  desc: "Data file uninitialized. Awaiting core input updates.", img: "images/42.jpg" },
-            { id: "rank_43", name: "Subject_43", score: 1,  desc: "Data file uninitialized. Awaiting core input updates.", img: "images/43.jpg" },
-            { id: "rank_44", name: "Subject_44", score: 0,  desc: "Data file uninitialized. Awaiting core input updates.", img: "images/44.jpg" },
-            { id: "rank_45", name: "Subject_45", score: 0,  desc: "Data file uninitialized. Awaiting core input updates.", img: "images/45.jpg" },
-            { id: "rank_46", name: "Subject_46", score: 0,  desc: "Data file uninitialized. Awaiting core input updates.", img: "images/46.jpg" },
-            { id: "rank_47", name: "Subject_47", score: 0,  desc: "Data file uninitialized. Awaiting core input updates.", img: "images/47.jpg" },
-            { id: "rank_48", name: "Subject_48", score: 0,  desc: "Data file uninitialized. Awaiting core input updates.", img: "images/48.jpg" },
-            { id: "rank_49", name: "Subject_49", score: 0,  desc: "Data file uninitialized. Awaiting core input updates.", img: "images/49.jpg" },
-            { id: "rank_50", name: "Subject_50", score: 0,  desc: "Data file uninitialized. Awaiting core input updates.", img: "images/50.jpg" },
-            { id: "rank_51", name: "Subject_51", score: 0,  desc: "Data file uninitialized. Awaiting core input updates.", img: "images/51.jpg" },
-            { id: "rank_52", name: "Subject_52", score: 0,  desc: "Data file uninitialized. Awaiting core input updates.", img: "images/52.jpg" },
-            { id: "rank_53", name: "Subject_53", score: 0,  desc: "Data file uninitialized. Awaiting core input updates.", img: "images/53.jpg" },
-            { id: "rank_54", name: "Subject_54", score: 0,  desc: "Data file uninitialized. Awaiting core input updates.", img: "images/54.jpg" },
-            { id: "rank_55", name: "Subject_55", score: 0,  desc: "Data file uninitialized. Awaiting core input updates.", img: "images/55.jpg" },
-            { id: "rank_56", name: "Subject_56", score: 0,  desc: "Data file uninitialized. Awaiting core input updates.", img: "images/56.jpg" },
-            { id: "rank_57", name: "Subject_57", score: 0,  desc: "Data file uninitialized. Awaiting core input updates.", img: "images/57.jpg" },
-            { id: "rank_58", name: "Subject_58", score: 0,  desc: "Data file uninitialized. Awaiting core input updates.", img: "images/58.jpg" },
-            { id: "rank_59", name: "Subject_59", score: 0,  desc: "Data file uninitialized. Awaiting core input updates.", img: "images/59.jpg" },
-            { id: "rank_60", name: "Subject_60", score: 0,  desc: "Data file uninitialized. Awaiting core input updates.", img: "images/60.jpg" },
-            { id: "rank_61", name: "Subject_61", score: 0,  desc: "Data file uninitialized. Awaiting core input updates.", img: "images/61.jpg" },
-            { id: "rank_62", name: "Subject_62", score: 0,  desc: "Data file uninitialized. Awaiting core input updates.", img: "images/62.jpg" },
-            { id: "rank_63", name: "Subject_63", score: 0,  desc: "Data file uninitialized. Awaiting core input updates.", img: "images/63.jpg" },
-            { id: "rank_64", name: "Subject_64", score: 0,  desc: "Data file uninitialized. Awaiting core input updates.", img: "images/64.jpg" },
-            { id: "rank_65", name: "Subject_65", score: 0,  desc: "Data file uninitialized. Awaiting core input updates.", img: "images/65.jpg" },
-            { id: "rank_66", name: "Subject_66", score: 0,  desc: "Data file uninitialized. Awaiting core input updates.", img: "images/66.jpg" },
-            { id: "rank_67", name: "Subject_67", score: 0,  desc: "Data file uninitialized. Awaiting core input updates.", img: "images/67.jpg" },
-            { id: "rank_68", name: "Subject_68", score: 0,  desc: "Data file uninitialized. Awaiting core input updates.", img: "images/68.jpg" },
-            { id: "rank_69", name: "Subject_69", score: 0,  desc: "Data file uninitialized. Awaiting core input updates.", img: "images/69.jpg" }
+            // PLACEHOLDERS FOR RANKS 5 TO 69
+            { id: "rank_5", name: "Subject_5", score: 90, desc: "Data file uninitialized.", img: "images/5.jpg" },
+            { id: "rank_6", name: "Subject_6", score: 88, desc: "Data file uninitialized.", img: "images/6.jpg" },
+            { id: "rank_7", name: "Subject_7", score: 85, desc: "Data file uninitialized.", img: "images/7.jpg" },
+            { id: "rank_8", name: "Subject_8", score: 83, desc: "Data file uninitialized.", img: "images/8.jpg" },
+            { id: "rank_9", name: "Subject_9", score: 80, desc: "Data file uninitialized.", img: "images/9.jpg" },
+            { id: "rank_10", name: "Subject_10", score: 78, desc: "Data file uninitialized.", img: "images/10.jpg" },
+            { id: "rank_11", name: "Subject_11", score: 75, desc: "Data file uninitialized.", img: "images/11.jpg" },
+            { id: "rank_12", name: "Subject_12", score: 73, desc: "Data file uninitialized.", img: "images/12.jpg" },
+            { id: "rank_13", name: "Subject_13", score: 70, desc: "Data file uninitialized.", img: "images/13.jpg" },
+            { id: "rank_14", name: "Subject_14", score: 68, desc: "Data file uninitialized.", img: "images/14.jpg" },
+            { id: "rank_15", name: "Subject_15", score: 65, desc: "Data file uninitialized.", img: "images/15.jpg" },
+            { id: "rank_16", name: "Subject_16", score: 63, desc: "Data file uninitialized.", img: "images/16.jpg" },
+            { id: "rank_17", name: "Subject_17", score: 60, desc: "Data file uninitialized.", img: "images/17.jpg" },
+            { id: "rank_18", name: "Subject_18", score: 58, desc: "Data file uninitialized.", img: "images/18.jpg" },
+            { id: "rank_19", name: "Subject_19", score: 55, desc: "Data file uninitialized.", img: "images/19.jpg" },
+            { id: "rank_20", name: "Subject_20", score: 53, desc: "Data file uninitialized.", img: "images/20.jpg" },
+            { id: "rank_21", name: "Subject_21", score: 50, desc: "Data file uninitialized.", img: "images/21.jpg" },
+            { id: "rank_22", name: "Subject_22", score: 48, desc: "Data file uninitialized.", img: "images/22.jpg" },
+            { id: "rank_23", name: "Subject_23", score: 45, desc: "Data file uninitialized.", img: "images/23.jpg" },
+            { id: "rank_24", name: "Subject_24", score: 43, desc: "Data file uninitialized.", img: "images/24.jpg" },
+            { id: "rank_25", name: "Subject_25", score: 40, desc: "Data file uninitialized.", img: "images/25.jpg" },
+            { id: "rank_26", name: "Subject_26", score: 38, desc: "Data file uninitialized.", img: "images/26.jpg" },
+            { id: "rank_27", name: "Subject_27", score: 35, desc: "Data file uninitialized.", img: "images/27.jpg" },
+            { id: "rank_28", name: "Subject_28", score: 33, desc: "Data file uninitialized.", img: "images/28.jpg" },
+            { id: "rank_29", name: "Subject_29", score: 30, desc: "Data file uninitialized.", img: "images/29.jpg" },
+            { id: "rank_30", name: "Subject_30", score: 28, desc: "Data file uninitialized.", img: "images/30.jpg" },
+            { id: "rank_31", name: "Subject_31", score: 25, desc: "Data file uninitialized.", img: "images/31.jpg" },
+            { id: "rank_32", name: "Subject_32", score: 23, desc: "Data file uninitialized.", img: "images/32.jpg" },
+            { id: "rank_33", name: "Subject_33", score: 20, desc: "Data file uninitialized.", img: "images/33.jpg" },
+            { id: "rank_34", name: "Subject_34", score: 18, desc: "Data file uninitialized.", img: "images/34.jpg" },
+            { id: "rank_35", name: "Subject_35", score: 15, desc: "Data file uninitialized.", img: "images/35.jpg" },
+            { id: "rank_36", name: "Subject_36", score: 13, desc: "Data file uninitialized.", img: "images/36.jpg" },
+            { id: "rank_37", name: "Subject_37", score: 10, desc: "Data file uninitialized.", img: "images/37.jpg" },
+            { id: "rank_38", name: "Subject_38", score: 8,  desc: "Data file uninitialized.", img: "images/38.jpg" },
+            { id: "rank_39", name: "Subject_39", score: 5,  desc: "Data file uninitialized.", img: "images/39.jpg" },
+            { id: "rank_40", name: "Subject_40", score: 4,  desc: "Data file uninitialized.", img: "images/40.jpg" },
+            { id: "rank_41", name: "Subject_41", score: 3,  desc: "Data file uninitialized.", img: "images/41.jpg" },
+            { id: "rank_42", name: "Subject_42", score: 2,  desc: "Data file uninitialized.", img: "images/42.jpg" },
+            { id: "rank_43", name: "Subject_43", score: 1,  desc: "Data file uninitialized.", img: "images/43.jpg" },
+            { id: "rank_44", name: "Subject_44", score: 0,  desc: "Data file uninitialized.", img: "images/44.jpg" },
+            { id: "rank_45", name: "Subject_45", score: 0,  desc: "Data file uninitialized.", img: "images/45.jpg" },
+            { id: "rank_46", name: "Subject_46", score: 0,  desc: "Data file uninitialized.", img: "images/46.jpg" },
+            { id: "rank_47", name: "Subject_47", score: 0,  desc: "Data file uninitialized.", img: "images/47.jpg" },
+            { id: "rank_48", name: "Subject_48", score: 0,  desc: "Data file uninitialized.", img: "images/48.jpg" },
+            { id: "rank_49", name: "Subject_49", score: 0,  desc: "Data file uninitialized.", img: "images/49.jpg" },
+            { id: "rank_50", name: "Subject_50", score: 0,  desc: "Data file uninitialized.", img: "images/50.jpg" },
+            { id: "rank_51", name: "Subject_51", score: 0,  desc: "Data file uninitialized.", img: "images/51.jpg" },
+            { id: "rank_52", name: "Subject_52", score: 0,  desc: "Data file uninitialized.", img: "images/52.jpg" },
+            { id: "rank_53", name: "Subject_53", score: 0,  desc: "Data file uninitialized.", img: "images/53.jpg" },
+            { id: "rank_54", name: "Subject_54", score: 0,  desc: "Data file uninitialized.", img: "images/54.jpg" },
+            { id: "rank_55", name: "Subject_55", score: 0,  desc: "Data file uninitialized.", img: "images/55.jpg" },
+            { id: "rank_56", name: "Subject_56", score: 0,  desc: "Data file uninitialized.", img: "images/56.jpg" },
+            { id: "rank_57", name: "Subject_57", score: 0,  desc: "Data file uninitialized.", img: "images/57.jpg" },
+            { id: "rank_58", name: "Subject_58", score: 0,  desc: "Data file uninitialized.", img: "images/58.jpg" },
+            { id: "rank_59", name: "Subject_59", score: 0,  desc: "Data file uninitialized.", img: "images/59.jpg" },
+            { id: "rank_60", name: "Subject_60", score: 0,  desc: "Data file uninitialized.", img: "images/60.jpg" },
+            { id: "rank_61", name: "Subject_61", score: 0,  desc: "Data file uninitialized.", img: "images/61.jpg" },
+            { id: "rank_62", name: "Subject_62", score: 0,  desc: "Data file uninitialized.", img: "images/62.jpg" },
+            { id: "rank_63", name: "Subject_63", score: 0,  desc: "Data file uninitialized.", img: "images/63.jpg" },
+            { id: "rank_64", name: "Subject_64", score: 0,  desc: "Data file uninitialized.", img: "images/64.jpg" },
+            { id: "rank_65", name: "Subject_65", score: 0,  desc: "Data file uninitialized.", img: "images/65.jpg" },
+            { id: "rank_66", name: "Subject_66", score: 0,  desc: "Data file uninitialized.", img: "images/66.jpg" },
+            { id: "rank_67", name: "Subject_67", score: 0,  desc: "Data file uninitialized.", img: "images/67.jpg" },
+            { id: "rank_68", name: "Subject_68", score: 0,  desc: "Data file uninitialized.", img: "images/68.jpg" },
+            { id: "rank_69", name: "Subject_69", score: 0,  desc: "Data file uninitialized.", img: "images/69.jpg" }
         ];
 
         const listFrame = document.getElementById('list-frame');
         const searchBar = document.getElementById('search-bar');
-        const securityKey = document.getElementById('security-key');
+        const covertKey = document.getElementById('covert-key');
         const emptyView = document.getElementById('empty-view');
         const dossierLayout = document.getElementById('dossier-layout');
         const detailFrame = document.getElementById('detail-frame');
@@ -339,19 +337,30 @@
             }
         }
 
-        // SEPARATE SECURE INTERACTION DETECTOR (Bypasses Enter key)
-        securityKey.addEventListener('input', (e) => {
+        // COVERT CORNER INPUT LISTENER
+        covertKey.addEventListener('input', (e) => {
             if (e.target.value === '1242767') {
-                adminAuthorized = !adminAuthorized;
-                document.body.classList.toggle('admin-mode', adminAuthorized);
-                document.getElementById('system-title').textContent = adminAuthorized ? '// CHUD_RANKINGS_ADMIN_OVERRIDE' : '// CHUD_RANKINGS_';
-                document.getElementById('portal-label').textContent = adminAuthorized ? "OVERRIDE LEVEL: DEITY" : "SECURITY OVERRIDE PORTAL";
-                displayToast(adminAuthorized ? "ACCESS GRANTED: ADMIN HUB OPENED" : "ADMIN CORES DISENGAGED", "adm");
+                adminAuthorized = true;
+                toggleAdminUI();
                 e.target.value = ''; 
-                if (currentActiveId) populateDossier(currentActiveId);
-                buildList();
             }
         });
+
+        // HIDDEN DEAD MAN'S SWITCH (Click Title to Exit)
+        function disengageOverride() {
+            if (!adminAuthorized) return;
+            adminAuthorized = false;
+            toggleAdminUI();
+            displayToast("ADMIN CORES PURGED", "err");
+        }
+
+        function toggleAdminUI() {
+            document.body.classList.toggle('admin-mode', adminAuthorized);
+            document.getElementById('system-title').textContent = adminAuthorized ? '// CHUD_RANKINGS_ADMIN_OVERRIDE' : '// CHUD_RANKINGS_';
+            if (adminAuthorized) displayToast("ACCESS GRANTED: ADMIN HUB OPENED", "adm");
+            if (currentActiveId) populateDossier(currentActiveId);
+            buildList();
+        }
 
         searchBar.addEventListener('input', (e) => {
             searchFilter = e.target.value;
@@ -370,7 +379,7 @@
             const registration = localStorage.getItem(trackingKey);
 
             if (registration && (targetTime - parseInt(registration)) < timeframe) {
-                displayToast(`REJECTED: 24H ${direction.toUpperCase()}VOTE RECOVERY PERIOD ACTIVE`, "err");
+                displayToast(`REJECTED: 24H ${direction.toUpperCase()}VOTE COOLDOWN ACTIVE`, "err");
                 return;
             }
 
@@ -378,7 +387,7 @@
             else rankingsData[idx].score -= 1;
 
             localStorage.setItem(trackingKey, targetTime.toString());
-            displayToast(`VOTE SUBMITTED. 24H ${direction.toUpperCase()}VOTE COOLDOWN LOCK PLACED.`);
+            displayToast(`VOTE SUBMITTED. 24H COOLDOWN INITIATED.`);
             sortData();
             populateDossier(currentActiveId);
         }
