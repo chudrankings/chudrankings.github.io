@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>// CHUD_RANKINGS_</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700;900&display=swap');
@@ -15,16 +15,16 @@
             --neon-red: #ff073a;
             --neon-admin: #bc13fe;
             --text-main: #ffffff;
-            --text-muted: #444444;
+            --text-muted: #888888;
             --glass-border: rgba(255, 255, 255, 0.05);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body::before {
-            content: " "; display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0;
+            content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0;
             background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-            z-index: 5; background-size: 100% 3px, 3px 100%; pointer-events: none;
+            z-index: -1; background-size: 100% 3px, 3px 100%; pointer-events: none;
         }
 
         body {
@@ -38,7 +38,7 @@
             color: var(--neon-green); text-shadow: 0 0 15px var(--neon-green); letter-spacing: 3px;
             border-bottom: 2px solid var(--neon-green-dim); background: rgba(5, 5, 5, 0.95);
             backdrop-filter: blur(10px); z-index: 10; display: flex; justify-content: space-between; align-items: center;
-            transition: all 0.4s ease;
+            transition: all 0.4s ease; flex-shrink: 0;
         }
         
         #system-title { cursor: pointer; user-select: none; }
@@ -47,25 +47,29 @@
         .search-bar {
             width: 250px; background: rgba(0, 0, 0, 0.6); border: 1px solid var(--neon-green-dim);
             color: var(--neon-green); font-family: 'Orbitron', sans-serif; padding: 8px 12px;
-            border-radius: 4px; outline: none; font-size: 0.85rem;
+            border-radius: 4px; outline: none; font-size: 0.85rem; transition: width 0.3s ease, border-color 0.3s ease;
         }
+        .search-bar:focus { border-color: var(--neon-green); box-shadow: 0 0 10px rgba(57, 255, 20, 0.2); }
 
         /* Main Window Layout */
-        .container { display: flex; flex: 1; padding: 20px; gap: 20px; height: calc(100vh - 75px); overflow: hidden; z-index: 3; }
+        .container { 
+            display: flex; flex: 1; padding: 20px; gap: 20px; overflow: hidden; z-index: 3; 
+        }
 
         .sidebar-panel {
             flex: 1.2; background: var(--panel-bg); border: 1px solid var(--glass-border); border-radius: 12px;
-            padding: 15px; display: flex; flex-direction: column; gap: 15px; box-shadow: inset 0 0 30px rgba(0,0,0,0.9); position: relative;
+            padding: 15px; display: flex; flex-direction: column; gap: 15px; box-shadow: inset 0 0 30px rgba(0,0,0,0.9); 
+            height: 100%; overflow: hidden;
         }
 
-        .list-section { flex: 1; overflow-y: auto; padding-right: 4px; }
+        .list-section { flex: 1; overflow-y: auto; padding-right: 4px; -webkit-overflow-scrolling: touch; }
         .list-section::-webkit-scrollbar { width: 4px; }
         .list-section::-webkit-scrollbar-thumb { background: var(--neon-green); border-radius: 2px; }
         body.admin-mode .list-section::-webkit-scrollbar-thumb { background: var(--neon-admin); }
 
         /* Premium Rank Items */
         .rank-item {
-            display: flex; justify-content: space-between; align-items: center; padding: 12px 16px;
+            display: flex; justify-content: space-between; align-items: center; padding: 14px 16px;
             background: rgba(20, 20, 20, 0.5); margin-bottom: 8px; border-radius: 6px; cursor: pointer;
             border: 1px solid transparent; border-left: 4px solid #252525; transition: all 0.2s ease;
         }
@@ -80,15 +84,14 @@
         body.admin-mode .rank-number { color: var(--neon-admin); }
         .rank-item.god-tier .rank-number { color: var(--neon-red); }
         
-        .rank-name { flex: 1; font-size: 1.3rem; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .rank-name { flex: 1; font-size: 1.3rem; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: flex; align-items: center; gap: 10px; }
         
-        /* Public Voting Mini Displays (Hidden from non-admins by default, or keep them subtle) */
-        .vote-tallies { display: flex; gap: 8px; margin-right: 15px; font-family: 'Orbitron', sans-serif; font-size: 0.8rem; font-weight: 700; }
-        .tally-up { color: var(--neon-green); opacity: 0.6; }
-        .tally-down { color: var(--neon-red); opacity: 0.6; }
-        .rank-item.active .tally-up, .rank-item.active .tally-down { opacity: 1; }
+        /* PUBLIC VOTES */
+        .public-votes { display: inline-flex; gap: 8px; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; font-weight: 900; background: rgba(0,0,0,0.6); padding: 4px 8px; border-radius: 6px; border: 1px solid #333; color: var(--text-muted); align-items: center; }
+        .public-votes .u { color: var(--neon-green); text-shadow: 0 0 5px rgba(57, 255, 20, 0.3); }
+        .public-votes .d { color: var(--neon-red); text-shadow: 0 0 5px rgba(255, 7, 58, 0.3); }
 
-        .rank-score-mini { font-family: 'Orbitron', sans-serif; background: #000; padding: 3px 10px; border-radius: 4px; font-weight: 900; border: 1px solid #333; min-width: 45px; text-align: center; }
+        .rank-score-mini { font-family: 'Orbitron', sans-serif; background: #000; padding: 4px 12px; border-radius: 4px; font-weight: 900; border: 1px solid #333; min-width: 45px; text-align: center; }
         .rank-item.active .rank-score-mini { border-color: var(--neon-green); color: var(--neon-green); }
         body.admin-mode .rank-item.active .rank-score-mini { border-color: var(--neon-admin); color: var(--neon-admin); }
         .rank-item.god-tier .rank-score-mini { border-color: var(--neon-red) !important; color: var(--neon-red) !important; }
@@ -97,10 +100,10 @@
         .detail-panel {
             flex: 1; background: radial-gradient(circle at top right, rgba(15,15,15,0.95) 0%, rgba(5,5,5,1) 100%);
             border: 1px solid var(--glass-border); border-radius: 12px; display: flex; flex-direction: column;
-            align-items: center; padding: 25px; box-shadow: inset 0 0 40px rgba(0,0,0,1); position: relative;
+            align-items: center; padding: 25px; box-shadow: inset 0 0 40px rgba(0,0,0,1); overflow-y: auto; height: 100%;
         }
 
-        .profile-frame { width: 180px; height: 180px; border-radius: 8px; border: 2px solid var(--neon-green); overflow: hidden; margin-bottom: 15px; background: #000; transition: border 0.3s; }
+        .profile-frame { width: 180px; height: 180px; border-radius: 8px; border: 2px solid var(--neon-green); overflow: hidden; margin-bottom: 15px; background: #000; transition: border 0.3s; flex-shrink: 0; }
         body.admin-mode .profile-frame { border-color: var(--neon-admin); }
         .detail-panel.god-active .profile-frame { border-color: var(--neon-red); box-shadow: 0 0 25px rgba(255,7,58,0.5); }
         .profile-img { width: 100%; height: 100%; object-fit: cover; }
@@ -111,32 +114,32 @@
         .detail-panel.god-active .profile-score { color: var(--neon-red); text-shadow: 0 0 10px rgba(255,7,58,0.4); }
 
         /* Functional Components */
-        .vote-console { display: flex; gap: 15px; margin-bottom: 25px; }
-        .vote-btn { background: transparent; border: 1px solid #444; color: #fff; font-family: 'Orbitron', sans-serif; padding: 8px 16px; cursor: pointer; font-weight: 700; border-radius: 4px; transition: all 0.2s; }
+        .vote-console { display: flex; gap: 15px; margin-bottom: 25px; width: 100%; justify-content: center; flex-wrap: wrap; }
+        .vote-btn { background: transparent; border: 1px solid #444; color: #fff; font-family: 'Orbitron', sans-serif; padding: 12px 20px; cursor: pointer; font-weight: 700; border-radius: 6px; transition: all 0.2s; font-size: 1rem; }
         .vote-btn:hover { background: rgba(255,255,255,0.04); }
         .vote-btn.up:active { border-color: var(--neon-green); color: var(--neon-green); }
         .vote-btn.down:active { border-color: var(--neon-red); color: var(--neon-red); }
 
+        /* Admin controls */
         .admin-override-box { display: none; flex-direction: column; align-items: center; width: 100%; background: rgba(188,19,254,0.04); border: 1px dashed var(--neon-admin); padding: 15px; border-radius: 6px; margin-bottom: 20px; }
         body.admin-mode .admin-override-box { display: flex; }
-        body.admin-mode .vote-console { display: none; }
 
-        .admin-btn-group { display: flex; gap: 15px; align-items: center; margin-top: 10px; }
-        .admin-action { background: rgba(188,19,254,0.1); border: 1px solid var(--neon-admin); color: var(--neon-admin); font-size: 1.3rem; width: 36px; height: 36px; cursor: pointer; font-family: 'Orbitron'; font-weight: 900; border-radius: 4px; }
-        .admin-action:hover { background: var(--neon-admin); color: #fff; }
+        .admin-btn-group { display: flex; gap: 15px; align-items: center; margin-top: 10px; flex-wrap: wrap; justify-content: center; }
+        .admin-action { background: rgba(188,19,254,0.1); border: 1px solid var(--neon-admin); color: var(--neon-admin); font-size: 1.5rem; width: 44px; height: 44px; cursor: pointer; font-family: 'Orbitron'; font-weight: 900; border-radius: 6px; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+        .admin-action:hover { background: var(--neon-admin); color: #fff; box-shadow: 0 0 10px var(--neon-admin); }
 
-        .profile-desc { color: #bbbbbb; text-align: center; line-height: 1.5; font-size: 0.95rem; width: 100%; background: rgba(0,0,0,0.4); padding: 15px; border-radius: 6px; border: 1px solid #1a1a1a; flex: 1; overflow-y: auto; }
+        .profile-desc { color: #bbbbbb; text-align: center; line-height: 1.5; font-size: 1rem; width: 100%; background: rgba(0,0,0,0.4); padding: 20px; border-radius: 6px; border: 1px solid #1a1a1a; margin-top: auto; }
 
         /* System Messages */
-        .toast { position: absolute; top: 15px; left: 50%; transform: translateX(-50%); background: #000; border: 1px solid var(--neon-green); color: var(--neon-green); font-family: 'Orbitron', sans-serif; padding: 10px 20px; border-radius: 4px; z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.2s; font-size: 0.9rem; font-weight: 700; }
+        .toast { position: fixed; top: 15px; left: 50%; transform: translateX(-50%); background: #000; border: 1px solid var(--neon-green); color: var(--neon-green); font-family: 'Orbitron', sans-serif; padding: 12px 24px; border-radius: 6px; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.2s; font-size: 1rem; font-weight: 700; text-align: center; width: max-content; max-width: 90vw; }
         .toast.err { border-color: var(--neon-red); color: var(--neon-red); }
         .toast.adm { border-color: var(--neon-admin); color: var(--neon-admin); }
 
-        #empty-view { display: flex; height: 100%; width: 100%; border: 1px dashed #222; border-radius: 8px; justify-content: center; align-items: center; color: var(--text-muted); font-family: 'Orbitron'; font-size: 1.1rem; }
+        #empty-view { display: flex; height: 100%; width: 100%; border: 1px dashed #222; border-radius: 8px; justify-content: center; align-items: center; color: var(--text-muted); font-family: 'Orbitron'; font-size: 1.1rem; text-align: center; padding: 20px; }
 
-        /* ABSOLUTE COVERT SECURITY INPUT PORTAL (BOTTOM RIGHT CORNER) */
+        /* ABSOLUTE COVERT SECURITY INPUT PORTAL */
         .stealth-portal {
-            position: absolute; bottom: 8px; right: 12px; z-index: 1000;
+            position: fixed; bottom: 8px; right: 12px; z-index: 1000;
             display: flex; align-items: center; gap: 5px; font-family: 'Orbitron', sans-serif;
             font-size: 0.65rem; color: #222; transition: color 0.3s;
         }
@@ -147,6 +150,45 @@
             text-align: right; caret-color: transparent;
         }
         body.admin-mode .stealth-input { color: rgba(188, 19, 254, 0.2); }
+
+        /* ==========================================================================
+           UNIVERSAL MOBILE & TABLET RESPONSIVENESS (FLUID STACKING)
+           ========================================================================== */
+        @media (max-width: 850px) {
+            body { 
+                height: auto; /* Remove strict height limitation */
+                min-height: 100vh;
+                overflow-y: auto; /* Allow the entire page to scroll naturally */
+                -webkit-overflow-scrolling: touch;
+            }
+            .header { 
+                flex-direction: column; gap: 12px; font-size: 1.5rem; text-align: center; padding: 15px; 
+            }
+            .search-bar { width: 100%; padding: 12px; font-size: 1rem; }
+            
+            .container { 
+                flex-direction: column; padding: 10px; gap: 15px; 
+                height: auto; overflow: visible;
+            }
+            
+            /* Break panels out of flex constraints to stack properly */
+            .sidebar-panel { 
+                flex: none; height: 50vh; /* Fixed height for the scrollable list on mobile */
+                padding: 10px; 
+            }
+            .detail-panel { 
+                flex: none; height: auto; min-height: 50vh; 
+                padding: 20px 15px; margin-bottom: 30px; /* Space for the covert portal */
+            }
+            
+            .profile-frame { width: 140px; height: 140px; }
+            .profile-name { font-size: 1.6rem; }
+            .rank-item { padding: 10px; }
+            .rank-name { font-size: 1.1rem; flex-direction: column; align-items: flex-start; gap: 4px; }
+            .public-votes { font-size: 0.75rem; padding: 2px 6px; }
+            
+            .stealth-portal { bottom: 5px; right: 5px; font-size: 0.55rem; background: var(--bg-color); padding: 2px 5px; border-radius: 4px; }
+        }
     </style>
 </head>
 <body>
@@ -164,22 +206,20 @@
         </div>
 
         <div class="detail-panel" id="detail-frame">
-            <div id="empty-view">SECURE DISPATCH TERMINAL IDLE</div>
+            <div id="empty-view">SECURE DISPATCH TERMINAL IDLE<br><br><span style="font-size:0.8rem;">SELECT A TARGET FROM THE DIRECTORY</span></div>
             
             <div id="dossier-layout" style="display:none; flex-direction:column; align-items:center; width:100%; height:100%;">
                 <div class="profile-frame"><img id="p-img" class="profile-img" src="" alt="Dossier Asset"></div>
                 <h1 id="p-name" class="profile-name">---</h1>
                 <div class="profile-score">SCORE: <span id="p-score">0</span></div>
 
-                <!-- Live Public Interaction Node -->
                 <div class="vote-console" id="public-console">
                     <button class="vote-btn up" id="btn-up">▲ UPVOTE</button>
                     <button class="vote-btn down" id="btn-down">▼ DOWNVOTE</button>
                 </div>
 
-                <!-- Dedicated Admin Shift System -->
                 <div class="admin-override-box">
-                    <div style="font-family:'Orbitron'; color:var(--neon-admin); font-size:0.8rem; letter-spacing:1px;">CORE DATABASE OVERRIDE</div>
+                    <div style="font-family:'Orbitron'; color:var(--neon-admin); font-size:0.8rem; letter-spacing:1px; text-align: center;">CORE DATABASE OVERRIDE</div>
                     <div class="admin-btn-group">
                         <button class="admin-action" id="adm-dec">-</button>
                         <span style="font-family:'Orbitron'; font-size:0.9rem; color:#fff;">ALTER RANK VALUE</span>
@@ -193,29 +233,83 @@
     </div>
 
     <div class="stealth-portal">
-        <span>v2.6.1-PRIME_</span>
+        <span>v3.1.0-MOBILE_</span>
         <input type="password" id="covert-key" class="stealth-input" maxlength="7" autocomplete="off">
     </div>
 
     <script>
-        // ARCHIVE DATA STREAM: Upvotes & Downvotes run isolated from core score values
+        // FULL 70 RANK DATA MATRIX
         let rankingsData = [
-            { id: "rank_0", name: "Darius, Vidhur, & Mukil", score: 0, upvotes: 0, downvotes: 0, desc: "System Sovereigns. Their data broken. Voting logic immune.", img: "images/0.jpg" },
-            { id: "rank_1", name: "Sofiane Moundir", score: 99, upvotes: 0, downvotes: 0, desc: "The ultimate walking paradox. Undeniably the biggest chud, yet radiates Chad energy.", img: "images/1.jpg" },
-            { id: "rank_2", name: "Chudley", score: 98, upvotes: 0, downvotes: 0, desc: "An absolute unit. Emits pure radioactive power cells.", img: "images/2.jpg" },
-            { id: "rank_3", name: "GigaChud", score: 97, upvotes: 0, downvotes: 0, desc: "Jawline completely sharper than a diamond pickaxe.", img: "images/3.jpg" },
-            { id: "rank_4", name: "Barnaby", score: 95, upvotes: 0, downvotes: 0, desc: "Eats structural drywall panels for breakfast.", img: "images/4.jpg" },
-            
-            // AUTOMATED ALLOCATION SLOTS (5 - 69)
-            ...Array.from({length: 65}, (_, i) => ({
-                id: `rank_${i + 5}`,
-                name: `Subject_${i + 5}`,
-                score: Math.max(0, 90 - (i * 2)),
-                upvotes: 0,
-                downvotes: 0,
-                desc: "Data file uninitialized.",
-                img: `images/${i + 5}.jpg`
-            }))
+            { id: "rank_0", name: "Darius, Vidhur, & Mukil", score: 0, desc: "System Sovereigns. Their data broken. Voting logic immune.", img: "images/0.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_1", name: "Sofiane Moundir", score: 99, desc: "The ultimate walking paradox. Undeniably the biggest chud, yet radiates Chad energy.", img: "images/1.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_2", name: "Chudley", score: 98, desc: "An absolute unit. Emits pure radioactive power cells.", img: "images/2.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_3", name: "GigaChud", score: 97, desc: "Jawline completely sharper than a diamond pickaxe.", img: "images/3.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_4", name: "Barnaby", score: 95, desc: "Eats structural drywall panels for breakfast.", img: "images/4.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_5", name: "Subject_5", score: 90, desc: "Data file uninitialized.", img: "images/5.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_6", name: "Subject_6", score: 88, desc: "Data file uninitialized.", img: "images/6.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_7", name: "Subject_7", score: 85, desc: "Data file uninitialized.", img: "images/7.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_8", name: "Subject_8", score: 82, desc: "Data file uninitialized.", img: "images/8.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_9", name: "Subject_9", score: 80, desc: "Data file uninitialized.", img: "images/9.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_10", name: "Subject_10", score: 78, desc: "Data file uninitialized.", img: "images/10.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_11", name: "Subject_11", score: 75, desc: "Data file uninitialized.", img: "images/11.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_12", name: "Subject_12", score: 72, desc: "Data file uninitialized.", img: "images/12.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_13", name: "Subject_13", score: 70, desc: "Data file uninitialized.", img: "images/13.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_14", name: "Subject_14", score: 68, desc: "Data file uninitialized.", img: "images/14.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_15", name: "Subject_15", score: 65, desc: "Data file uninitialized.", img: "images/15.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_16", name: "Subject_16", score: 62, desc: "Data file uninitialized.", img: "images/16.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_17", name: "Subject_17", score: 60, desc: "Data file uninitialized.", img: "images/17.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_18", name: "Subject_18", score: 58, desc: "Data file uninitialized.", img: "images/18.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_19", name: "Subject_19", score: 55, desc: "Data file uninitialized.", img: "images/19.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_20", name: "Subject_20", score: 52, desc: "Data file uninitialized.", img: "images/20.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_21", name: "Subject_21", score: 50, desc: "Data file uninitialized.", img: "images/21.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_22", name: "Subject_22", score: 48, desc: "Data file uninitialized.", img: "images/22.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_23", name: "Subject_23", score: 45, desc: "Data file uninitialized.", img: "images/23.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_24", name: "Subject_24", score: 42, desc: "Data file uninitialized.", img: "images/24.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_25", name: "Subject_25", score: 40, desc: "Data file uninitialized.", img: "images/25.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_26", name: "Subject_26", score: 38, desc: "Data file uninitialized.", img: "images/26.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_27", name: "Subject_27", score: 35, desc: "Data file uninitialized.", img: "images/27.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_28", name: "Subject_28", score: 32, desc: "Data file uninitialized.", img: "images/28.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_29", name: "Subject_29", score: 30, desc: "Data file uninitialized.", img: "images/29.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_30", name: "Subject_30", score: 28, desc: "Data file uninitialized.", img: "images/30.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_31", name: "Subject_31", score: 25, desc: "Data file uninitialized.", img: "images/31.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_32", name: "Subject_32", score: 22, desc: "Data file uninitialized.", img: "images/32.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_33", name: "Subject_33", score: 20, desc: "Data file uninitialized.", img: "images/33.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_34", name: "Subject_34", score: 18, desc: "Data file uninitialized.", img: "images/34.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_35", name: "Subject_35", score: 15, desc: "Data file uninitialized.", img: "images/35.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_36", name: "Subject_36", score: 12, desc: "Data file uninitialized.", img: "images/36.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_37", name: "Subject_37", score: 10, desc: "Data file uninitialized.", img: "images/37.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_38", name: "Subject_38", score: 8, desc: "Data file uninitialized.", img: "images/38.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_39", name: "Subject_39", score: 7, desc: "Data file uninitialized.", img: "images/39.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_40", name: "Subject_40", score: 6, desc: "Data file uninitialized.", img: "images/40.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_41", name: "Subject_41", score: 5, desc: "Data file uninitialized.", img: "images/41.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_42", name: "Subject_42", score: 4, desc: "Data file uninitialized.", img: "images/42.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_43", name: "Subject_43", score: 3, desc: "Data file uninitialized.", img: "images/43.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_44", name: "Subject_44", score: 2, desc: "Data file uninitialized.", img: "images/44.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_45", name: "Subject_45", score: 1, desc: "Data file uninitialized.", img: "images/45.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_46", name: "Subject_46", score: 0, desc: "Data file uninitialized.", img: "images/46.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_47", name: "Subject_47", score: 0, desc: "Data file uninitialized.", img: "images/47.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_48", name: "Subject_48", score: 0, desc: "Data file uninitialized.", img: "images/48.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_49", name: "Subject_49", score: 0, desc: "Data file uninitialized.", img: "images/49.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_50", name: "Subject_50", score: 0, desc: "Data file uninitialized.", img: "images/50.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_51", name: "Subject_51", score: 0, desc: "Data file uninitialized.", img: "images/51.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_52", name: "Subject_52", score: 0, desc: "Data file uninitialized.", img: "images/52.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_53", name: "Subject_53", score: 0, desc: "Data file uninitialized.", img: "images/53.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_54", name: "Subject_54", score: 0, desc: "Data file uninitialized.", img: "images/54.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_55", name: "Subject_55", score: 0, desc: "Data file uninitialized.", img: "images/55.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_56", name: "Subject_56", score: 0, desc: "Data file uninitialized.", img: "images/56.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_57", name: "Subject_57", score: 0, desc: "Data file uninitialized.", img: "images/57.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_58", name: "Subject_58", score: 0, desc: "Data file uninitialized.", img: "images/58.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_59", name: "Subject_59", score: 0, desc: "Data file uninitialized.", img: "images/59.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_60", name: "Subject_60", score: 0, desc: "Data file uninitialized.", img: "images/60.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_61", name: "Subject_61", score: 0, desc: "Data file uninitialized.", img: "images/61.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_62", name: "Subject_62", score: 0, desc: "Data file uninitialized.", img: "images/62.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_63", name: "Subject_63", score: 0, desc: "Data file uninitialized.", img: "images/63.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_64", name: "Subject_64", score: 0, desc: "Data file uninitialized.", img: "images/64.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_65", name: "Subject_65", score: 0, desc: "Data file uninitialized.", img: "images/65.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_66", name: "Subject_66", score: 0, desc: "Data file uninitialized.", img: "images/66.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_67", name: "Subject_67", score: 0, desc: "Data file uninitialized.", img: "images/67.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_68", name: "Subject_68", score: 0, desc: "Data file uninitialized.", img: "images/68.jpg", upvotes: 0, downvotes: 0 },
+            { id: "rank_69", name: "Subject_69", score: 0, desc: "Data file uninitialized.", img: "images/69.jpg", upvotes: 0, downvotes: 0 }
         ];
 
         const listFrame = document.getElementById('list-frame');
@@ -234,9 +328,10 @@
             toast.textContent = text;
             toast.className = `toast ${mode === 'err' ? 'err' : mode === 'adm' ? 'adm' : ''}`;
             toast.style.opacity = '1';
-            setTimeout(() => toast.style.opacity = '0', 2500);
+            setTimeout(() => toast.style.opacity = '0', 3000);
         }
 
+        // Sort primarily by main score. (Votes do not affect order)
         function sortData() {
             const sovereign = rankingsData[0];
             const mortals = rankingsData.slice(1).sort((a, b) => b.score - a.score);
@@ -255,17 +350,25 @@
                 const node = document.createElement('div');
                 node.className = `rank-item ${isSovereign ? 'god-tier' : ''} ${item.id === currentActiveId ? 'active' : ''}`;
                 
-                // Show public vote tallies instantly alongside the row item
                 node.innerHTML = `
                     <div class="rank-number">#${originalIndex}</div>
-                    <div class="rank-name">${item.name}</div>
-                    <div class="vote-tallies">
-                        <span class="tally-up">▲${item.upvotes}</span>
-                        <span class="tally-down">▼${item.downvotes}</span>
+                    <div class="rank-name">
+                        ${item.name}
+                        <span class="public-votes"><span class="u">▲ ${item.upvotes}</span> <span class="d">▼ ${item.downvotes}</span></span>
                     </div>
                     <div class="rank-score-mini">${item.score}</div>
                 `;
-                node.addEventListener('click', () => populateDossier(item.id));
+                
+                node.addEventListener('click', () => {
+                    populateDossier(item.id);
+                    // Mobile auto-scroll logic to snap smoothly to the dossier panel
+                    if (window.innerWidth <= 850) {
+                        setTimeout(() => {
+                            detailFrame.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }, 50);
+                    }
+                });
+                
                 listFrame.appendChild(node);
             });
         }
@@ -295,16 +398,18 @@
             }
         }
 
-        // HIDDEN AUTH INGESTION NODE
+        // COVERT CORNER INPUT LISTENER (Using passcode 1242767)
         covertKey.addEventListener('input', (e) => {
-            if (e.target.value === '12467') {
+            if (e.target.value === '1242767') {
                 adminAuthorized = true;
                 toggleAdminUI();
                 e.target.value = ''; 
+                // Hide keyboard on mobile by blurring input
+                covertKey.blur();
             }
         });
 
-        // HIDDEN SYSTEM PURGE LINK (Click Header to Disengage)
+        // HIDDEN DEAD MAN'S SWITCH (Click Title to Exit)
         function disengageOverride() {
             if (!adminAuthorized) return;
             adminAuthorized = false;
@@ -325,15 +430,15 @@
             buildList();
         });
 
-        // PUBLIC VOTING MODULE - Logs votes, doesn't touch base score
-        function executePublicVote(direction) {
+        // VOTING LOGIC - Updates tally, NOT main score
+        function executeVote(direction) {
             if (!currentActiveId) return;
             const idx = rankingsData.findIndex(c => c.id === currentActiveId);
             if (idx === 0) return;
 
             const targetTime = Date.now();
             const timeframe = 24 * 60 * 60 * 1000; 
-            const trackingKey = direction === 'up' ? 'matrix_cooldown_up' : 'matrix_cooldown_down';
+            const trackingKey = direction === 'up' ? `matrix_cooldown_up_${currentActiveId}` : `matrix_cooldown_down_${currentActiveId}`;
             const registration = localStorage.getItem(trackingKey);
 
             if (registration && (targetTime - parseInt(registration)) < timeframe) {
@@ -341,18 +446,22 @@
                 return;
             }
 
-            if (direction === 'up') rankingsData[idx].upvotes += 1;
-            else rankingsData[idx].downvotes += 1;
+            if (direction === 'up') {
+                rankingsData[idx].upvotes += 1;
+            } else {
+                rankingsData[idx].downvotes += 1;
+            }
 
             localStorage.setItem(trackingKey, targetTime.toString());
-            displayToast(`VOTE RECORDED UNDER CURRENT DISPATCH`);
-            buildList(); 
+            displayToast(`VOTE RECORDED. 24H COOLDOWN INITIATED.`);
+            
+            buildList();
         }
 
-        document.getElementById('btn-up').addEventListener('click', () => executePublicVote('up'));
-        document.getElementById('btn-down').addEventListener('click', () => executePublicVote('down'));
+        document.getElementById('btn-up').addEventListener('click', () => executeVote('up'));
+        document.getElementById('btn-down').addEventListener('click', () => executeVote('down'));
 
-        // ADMIN EXCLUSIVE DESTRUCTIVE/CONSTRUCTIVE MATRIX SHIFTS
+        // LIVE ROOT MODIFICATION CONTROLS (Admins Only - Changes Main Score)
         function forceValueShift(amount) {
             if (!currentActiveId || !adminAuthorized) return;
             const idx = rankingsData.findIndex(c => c.id === currentActiveId);
